@@ -1,8 +1,7 @@
 #include "bwIIR.hpp"
 
-using namespace openAFE;
 	
-	double *binomial_mult( int n, double *p ) {
+	double *openAFE::binomial_mult( int n, double *p ) {
 		int i, j;
 		double *a;
 
@@ -22,7 +21,7 @@ using namespace openAFE;
 		return( a );
 	}
 
-	double *trinomial_mult( int n, double *b, double *c ) {
+	double *openAFE::trinomial_mult( int n, double *b, double *c ) {
 		int i, j;
 		double *a;
 
@@ -56,7 +55,7 @@ using namespace openAFE;
 		return( a );
 	}
 
-	double *dcof_bwlp( int n, double fcf ) {
+	double *openAFE::dcof_bwlp( int n, double fcf ) {
 		int k;            // loop variables
 		double theta;     // M_PI * fcf / 2.0
 		double st;        // sine of theta
@@ -95,11 +94,11 @@ using namespace openAFE;
 		return( dcof );
 	}
 
-	double *dcof_bwhp( int n, double fcf ) {
+	double *openAFE::dcof_bwhp( int n, double fcf ) {
 		return( dcof_bwlp( n, fcf ) );
 	}
 
-	double *dcof_bwbp( int n, double f1f, double f2f ) {
+	double *openAFE::dcof_bwbp( int n, double f1f, double f2f ) {
 		int k;            // loop variables
 		double theta;     // M_PI * (f2f - f1f) / 2.0
 		double cp;        // cosine of phi
@@ -148,7 +147,7 @@ using namespace openAFE;
 		return( dcof );
 	}
 
-	double *dcof_bwbs( int n, double f1f, double f2f ) {
+	double *openAFE::dcof_bwbs( int n, double f1f, double f2f ) {
 		int k;            // loop variables
 		double theta;     // M_PI * (f2f - f1f) / 2.0
 		double cp;        // cosine of phi
@@ -197,7 +196,7 @@ using namespace openAFE;
 		return( dcof );
 	}
 
-	int *ccof_bwlp( int n ) {
+	int *openAFE::ccof_bwlp( int n ) {
 		int *ccof;
 		int m;
 		int i;
@@ -219,7 +218,7 @@ using namespace openAFE;
 		return( ccof );
 	}
 
-	int *ccof_bwhp( int n ) {
+	int *openAFE::ccof_bwhp( int n ) {
 		int *ccof;
 		int i;
 
@@ -232,7 +231,7 @@ using namespace openAFE;
 		return( ccof );
 	}
 
-	int *ccof_bwbp( int n ) {
+	int *openAFE::ccof_bwbp( int n ) {
 		int *tcof;
 		int *ccof;
 		int i;
@@ -254,7 +253,7 @@ using namespace openAFE;
 		return( ccof );
 	}
 
-	double *ccof_bwbs( int n, double f1f, double f2f ) {
+	double *openAFE::ccof_bwbs( int n, double f1f, double f2f ) {
 		double alpha;
 		double *ccof;
 		int i, j;
@@ -281,8 +280,9 @@ using namespace openAFE;
 		return( ccof );
 	}
 
-	double sf_bwlp( int n, double fcf ) {
-		int m, k;         // loop variables
+	double openAFE::sf_bwlp( int n, double fcf ) {
+		// int m, 
+		int k;         // loop variables
 		double omega;     // M_PI * fcf
 		double fomega;    // function of omega
 		double parg0;     // zeroth pole angle
@@ -292,7 +292,7 @@ using namespace openAFE;
 		fomega = sin(omega);
 		parg0 = M_PI / (double)(2*n);
 
-		m = n / 2;
+		// m = n / 2;
 		sf = 1.0;
 		for( k = 0; k < n/2; ++k )
 			sf *= 1.0 + fomega * sin((double)(2*k+1)*parg0);
@@ -305,8 +305,9 @@ using namespace openAFE;
 		return(sf);
 	}
 
-	double sf_bwhp( int n, double fcf ) {
-		int m, k;         // loop variables
+	double openAFE::sf_bwhp( int n, double fcf ) {
+		// int m, 
+		int k;         // loop variables
 		double omega;     // M_PI * fcf
 		double fomega;    // function of omega
 		double parg0;     // zeroth pole angle
@@ -316,7 +317,7 @@ using namespace openAFE;
 		fomega = sin(omega);
 		parg0 = M_PI / (double)(2*n);
 
-		m = n / 2;
+		// m = n / 2;
 		sf = 1.0;
 		for( k = 0; k < n/2; ++k )
 			sf *= 1.0 + fomega * sin((double)(2*k+1)*parg0);
@@ -329,7 +330,7 @@ using namespace openAFE;
 		return(sf);
 	}
 
-	double sf_bwbp( int n, double f1f, double f2f ) {
+	double openAFE::sf_bwbp( int n, double f1f, double f2f ) {
 		int k;            // loop variables
 		double ctt;       // cotangent of theta
 		double sfr, sfi;  // real and imaginary parts of the scaling factor
@@ -357,7 +358,7 @@ using namespace openAFE;
 		return( 1.0 / sfr );
 	}
 
-	double sf_bwbs( int n, double f1f, double f2f ) {
+	double openAFE::sf_bwbs( int n, double f1f, double f2f ) {
 		int k;            // loop variables
 		double tt;        // tangent of theta
 		double sfr, sfi;  // real and imaginary parts of the scaling factor

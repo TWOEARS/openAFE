@@ -9,6 +9,7 @@
 #include <assert.h>
 
 #include "CascadeFilters.hpp"
+#include "bwCoef.hpp"
 
 namespace openAFE {
 
@@ -20,7 +21,7 @@ namespace openAFE {
 				
 		public:
 				
-			bwFilter(double fs, unsigned short argOrder = 2, float f1 = 1000, bwType type = _bwlp, float f2 = 0);
+			bwFilter(double fs, uint32_t argOrder = 2, double f1 = 1000, bwType type = _bwlp, double f2 = 0);
 			
 			~bwFilter();
 			

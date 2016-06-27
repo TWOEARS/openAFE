@@ -1,13 +1,10 @@
 SUBDIRS = tools Signals Filters Processors
 AUTOMAKE_OPTIONS = subdir-objects
 
+AM_CXXFLAGS=$(CPPFLAGS)
+
 @LTLIBOBJS@
 lib_LTLIBRARIES = libopenAFE.la
-
-libopenAFE_la_CPPFLAGS= $(requires_CFLAGS)
-libopenAFE_la_CPPFLAGS+= -Wall -g -O -std=c++11 -lpthread -D_REENTRANT -DHAVE_INLINE
-libopenAFE_la_LDFLAGS=	$(requires_LIBS)
-libopenAFE_la_LDFLAGS+=	-release $(PACKAGE_VERSION)
 
 libopenAFE_la_SOURCES = tools/window.cpp
 libopenAFE_la_SOURCES += Signals/Signal.cpp
@@ -17,6 +14,7 @@ libopenAFE_la_SOURCES += Filters/bwFilter.cpp
 libopenAFE_la_SOURCES += Filters/GammatoneFilter.cpp
 libopenAFE_la_SOURCES += Processors/Processor.cpp
 libopenAFE_la_SOURCES += Processors/inputProc.cpp
+libopenAFE_la_SOURCES += Processors/preProc.cpp
 
 libopenAFE_la_LIBADD = tools/libtools.a
 libopenAFE_la_LIBADD += Signals/libsignals.a
@@ -42,9 +40,10 @@ filter_HEADERS += Filters/bwIIR.hpp
 filter_HEADERS += Filters/bwCoef.hpp
 filter_HEADERS += Filters/bwFilter.hpp
 
-processordir=$(pkgincludedir)/Processor
+processordir=$(pkgincludedir)/Processors
 processor_HEADERS = Processors/Processor.hpp
 processor_HEADERS += Processors/TDSProcessor.hpp
 processor_HEADERS += Processors/TFSProcessor.hpp
 processor_HEADERS += Processors/ProcessorVector.hpp
 processor_HEADERS += Processors/inputProc.hpp
+processor_HEADERS += Processors/preProc.hpp

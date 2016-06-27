@@ -1,8 +1,5 @@
 noinst_LIBRARIES = libfilters.a
 
-libfilters_a_CPPFLAGS= $(requires_CFLAGS)
-libfilters_a_CPPFLAGS+= -Wall -g -O -std=c++11 -lpthread -D_REENTRANT -DHAVE_INLINE
-
 libfilters_a_SOURCES = GenericFilter.hpp
 libfilters_a_SOURCES += CascadeFilters.hpp
 libfilters_a_SOURCES += bwIIR.hpp

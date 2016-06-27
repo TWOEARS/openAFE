@@ -1,17 +1,16 @@
 #include "bwCoef.hpp"
 
-using namespace openAFE {
 	
-	double bwCoef(unsigned int n, double fs, double f1f, std::vector<double>& vectDcof, std::vector<double>& vectCcof, bwType type,  double f2f = 0) {
+	double openAFE::bwCoef(unsigned int n, double fs, double f1f, std::vector<double>& vectDcof, std::vector<double>& vectCcof, bwType type,  double f2f) {
 
 		// int n;           - filter order
 		// int sff		-  scale flag: 1 to scale, 0 to not scale ccof
 		unsigned int i;            	// loop variables
 		// double fcf	-     cutoff frequency (fraction of pi)
-		double sf;        	// scaling factor
-		double *dcof;     	// d coefficients
-		int *ccof;        	// c coefficients
-		double *ccofD;      // c coefficients
+		double sf = 0;        	// scaling factor
+		double *dcof = NULL;     	// d coefficients
+		int *ccof  = NULL;        	// c coefficients
+		double *ccofD = NULL;      // c coefficients
 
 		f1f = f1f / ( 0.5 * fs );
 		f2f = f2f / ( 0.5 * fs );
