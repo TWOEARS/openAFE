@@ -15,6 +15,9 @@ libopenAFE_la_SOURCES += Filters/GammatoneFilter.cpp
 libopenAFE_la_SOURCES += Processors/Processor.cpp
 libopenAFE_la_SOURCES += Processors/inputProc.cpp
 libopenAFE_la_SOURCES += Processors/preProc.cpp
+libopenAFE_la_SOURCES += Processors/gammatoneProc.cpp
+libopenAFE_la_SOURCES += Processors/ihcProc.cpp
+libopenAFE_la_SOURCES += Processors/ildProc.cpp
 
 libopenAFE_la_LIBADD = tools/libtools.a
 libopenAFE_la_LIBADD += Signals/libsignals.a
@@ -47,3 +50,6 @@ processor_HEADERS += Processors/TFSProcessor.hpp
 processor_HEADERS += Processors/ProcessorVector.hpp
 processor_HEADERS += Processors/inputProc.hpp
 processor_HEADERS += Processors/preProc.hpp
+processor_HEADERS += Processors/gammatoneProc.hpp
+processor_HEADERS += Processors/ihcProc.hpp
+processor_HEADERS += Processors/ildProc.hpp

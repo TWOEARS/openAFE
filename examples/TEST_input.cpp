@@ -1,104 +1,70 @@
-// Compile : g++ -o run test.cpp -lopenAFE -std=c++11
-
-
 #include <memory>
 #include <iostream>
 #include <exception>
 
 #include "../src/Processors/inputProc.hpp"
-
-#define CHUNK_SIZE 100
+#include "matFiles.hpp"
 
 using namespace openAFE;
 
 int main(int argc, char **argv) {
 	
-  std::string name;
-  uint32_t fs;
-  double bufferSize_s;
-  bool doNormalize;
-  uint32_t normalizeValue;
-
-  std::vector<double> left(CHUNK_SIZE), right(CHUNK_SIZE);
-  for ( std::size_t ii = 0 ; ii < CHUNK_SIZE ; ++ii ) {
-	left[ii] = ii;
-	right[ii] = ii + CHUNK_SIZE;
-  }
-   
-  switch ( argc ) {
-	  case 1:
-		name = "input";
-		fs = 44100;
-		bufferSize_s = 10;
-		doNormalize = false;
-		normalizeValue = MAXCODABLEVALUE;
-		break;
-	  case 2:
-		name = argv[1];
-		fs = 44100;
-		bufferSize_s = 10;
-		doNormalize = false;
-		normalizeValue = MAXCODABLEVALUE;
-		break;
-	  case 3:
-		name = argv[1];
-		fs = atoi(argv[2]);
-		bufferSize_s = 10;
-		doNormalize = false;
-		normalizeValue = MAXCODABLEVALUE;
-		break;
-	  case 4:
-		name = argv[1];
-		fs = atoi(argv[2]);
-		bufferSize_s = atoi(argv[3]);
-		doNormalize = false;
-		normalizeValue = MAXCODABLEVALUE;
-		break;
-	  case 5:
-		name = argv[1];
-		fs = atoi(argv[2]);
-		bufferSize_s = atoi(argv[3]);
-		doNormalize = *(argv[4]) != '0';
-		normalizeValue = MAXCODABLEVALUE;
-		break;
-	  case 6:
-		name = argv[1];
-		fs = atoi(argv[2]);
-		bufferSize_s = atoi(argv[3]);
-		doNormalize = *(argv[4]) != '0';
-		normalizeValue = atoi(argv[5]);
-		break;		
-	  default:
-		throw new std::string("The correct usage is ./TEST_input name fs bufferSize_s doNormalize normalizeValue");
-		break;			 
-  }
-
-std::cout << name << std::endl;
-
-  std::shared_ptr <InputProc > inputSignal;
+  std::vector <std::vector<double> > earSignals;
+  double fsHz;
   
-  inputSignal.reset( new InputProc(name, fs, bufferSize_s, doNormalize, normalizeValue ) );
-
-  inputSignal->processChunk ( left.data(), left.size(), right.data(), right.size() );
-  inputSignal->releaseChunk();
+  std::string dataPath = "../../examples/Test_signals/AFE_earSignals_16kHz.mat";  
+  std::string outputName = "input_out.mat"; 		  
   
-  std::shared_ptr<twoCTypeBlock<double> > lOut = inputSignal->getLeftWholeBufferAccessor();
-  std::shared_ptr<twoCTypeBlock<double> > rOut = inputSignal->getRightWholeBufferAccessor();
-  
-  std::cout << "left : ";
-  for ( std::size_t ii = 0 ; ii < lOut->array1.second ; ++ii )
-	std::cout << *(lOut->array1.first + ii ) << " ";
-  for ( std::size_t ii = 0 ; ii < lOut->array2.second ; ++ii )
-	std::cout << *(lOut->array2.first + ii ) << " ";
-  std::cout << std::endl;	
-
-  std::cout << "right : ";
-  for ( std::size_t ii = 0 ; ii < rOut->array1.second ; ++ii )
-	std::cout << *(rOut->array1.first + ii ) << " ";
-  for ( std::size_t ii = 0 ; ii < rOut->array2.second ; ++ii )
-	std::cout << *(rOut->array2.first + ii ) << " ";
-  std::cout << std::endl;	
-
+  double bufferSize_s = 10;
+  bool doNormalize = false;
+  uint32_t normalizeValue = MAXCODABLEVALUE;
     
+	  switch ( argc ) {
+		  case 1:
+			break;
+		  case 2:
+			dataPath = argv[1];
+			break;
+		  case 3:
+			dataPath = argv[1];
+			outputName = argv[2];
+			break;
+		  case 4:
+			dataPath = argv[1];
+			outputName = argv[2];
+			bufferSize_s = atoi(argv[3]);
+			break;
+		  case 5:
+			dataPath = argv[1];
+			outputName = argv[2];
+			bufferSize_s = atoi(argv[3]);
+			doNormalize = *(argv[4]) != '0';
+			break;
+		  case 6:
+			dataPath = argv[1];
+			outputName = argv[2];
+			bufferSize_s = atoi(argv[3]);
+			doNormalize = *(argv[4]) != '0';
+			normalizeValue = atoi(argv[5]);
+			break;		
+		  default:
+			throw new std::string("The correct usage is : ./TEST_input inFilePath outputName bufferSize_s doNormalize normalizeValue");
+			break;			 
+	  }
+
+  int result = matFiles::readMatFile(dataPath.c_str(), earSignals, &fsHz);
+  
+  if ( result == 0 ) {
+	  std::shared_ptr <InputProc > inputSignal;
+	  inputSignal.reset( new InputProc("input" /* name */, fsHz, bufferSize_s, doNormalize, normalizeValue ) );
+
+	  inputSignal->processChunk ( earSignals[0].data(), earSignals[0].size(), earSignals[1].data(), earSignals[1].size() );
+	  inputSignal->releaseChunk();
+	  
+	  std::shared_ptr<twoCTypeBlock<double> > lOut = inputSignal->getLeftWholeBufferAccessor();
+	  std::shared_ptr<twoCTypeBlock<double> > rOut = inputSignal->getRightWholeBufferAccessor();
+  
+	  matFiles::writeTDSMatFile(outputName.c_str(), lOut, rOut, fsHz);
+  }
   return 0;
 }

@@ -1,5 +1,8 @@
 #include "bwFilter.hpp"
 
+#include <iostream>
+
+
 		uint32_t openAFE::bwFilter::cascadeNumber( uint32_t argOrder ) {
 			return ( std::floor( argOrder / 2 ) + ( argOrder % 2 ) );
 		}
@@ -16,10 +19,11 @@
 				bwCoef(2, fs, f1, vectDcof, vectCcof, type, f2);
 				
 				for ( std::size_t ii = 0 ; ii < std::floor( argOrder / 2 ) ; ++ii)
-					this->setFilter( vectDcof.data(), vectDcof.size(), vectCcof.data(), vectCcof.size() );
+					this->setFilter( vectCcof.data(), vectCcof.size(), vectDcof.data(), vectDcof.size() );
 			}
 			
 			if ( argOrder % 2 == 1 ) {
+
 				// Than we get the coeffs of a first order filter
 				std::fill(vectDcof.begin(), vectDcof.end(), 0);
 				std::fill(vectCcof.begin(), vectCcof.end(), 0);

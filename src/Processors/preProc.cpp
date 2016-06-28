@@ -13,7 +13,7 @@ using namespace openAFE;
 			// Actual Processing
 			void PreProc::process ( double* firstValue_l, std::size_t dim_l, double* firstValue_r, std::size_t dim_r ) {
 			
-					// 1- DC-removal filter					
+					// 1- DC-removal filter
 					if ( this->pp_bRemoveDC ) {
 						std::thread leftThread1( &bwFilter::exec, this->dcFilter_l, firstValue_l, dim_l , firstValue_l );
 						std::thread rightThread1( &bwFilter::exec, this->dcFilter_r, firstValue_r, dim_r , firstValue_r );

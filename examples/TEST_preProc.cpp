@@ -1,62 +1,172 @@
-
 #include <memory>
 #include <iostream>
 
 #include "../src/Processors/inputProc.hpp"
 #include "../src/Processors/preProc.hpp"
 
-#define CHUNK_SIZE 100
+#include "matFiles.hpp"
 
 using namespace openAFE;
 
 int main(int argc, char **argv) {
 
-  std::vector<double> left(CHUNK_SIZE), right(CHUNK_SIZE);
-  for ( std::size_t ii = 0 ; ii < CHUNK_SIZE ; ++ii ) {
-	left[ii] = ii;
-	right[ii] = ii + CHUNK_SIZE;
-  }
-
-  std::shared_ptr <InputProc > inputSignal; 
-  inputSignal.reset( new InputProc("input's Name", 44100, 10, false) );
-
-  std::shared_ptr <PreProc > ppSignal;
-  ppSignal.reset( new PreProc("input's Name", inputSignal, true, // pp_bRemoveDC
-														   20, // pp_cutoffHzDC
-														   false, // pp_bPreEmphasis
-														   0.97, // pp_coefPreEmphasis
-														   false, // pp_bNormalizeRMS
-														   0.5, // pp_intTimeSecRMS
-														   false, // pp_bLevelScaling
-														   100, // pp_refSPLdB
-														   false, // pp_bMiddleEarFiltering
-														   _jepsen, // pp_middleEarModel
-														   true ) ); // pp_bUnityComp
-																						  
-																						  
-  inputSignal->processChunk (left.data(), left.size(), right.data(), right.size() );
-  inputSignal->releaseChunk(); 
+  std::vector <std::vector<double> > earSignals;
+  double fsHz;
   
-  ppSignal->processChunk ();
-  ppSignal->releaseChunk();  	
+  std::string dataPath = "../../examples/Test_signals/AFE_earSignals_16kHz.mat";  
+  std::string outputName = "preProc_out.mat"; 
   
-  std::shared_ptr<twoCTypeBlock<double> > lOut = ppSignal->getLeftWholeBufferAccessor();
-  std::shared_ptr<twoCTypeBlock<double> > rOut = ppSignal->getRightWholeBufferAccessor();
   
-  std::cout << "left : ";
-  for ( std::size_t ii = 0 ; ii < lOut->array1.second ; ++ii )
-	std::cout << *(lOut->array1.first + ii ) << " ";
-  for ( std::size_t ii = 0 ; ii < lOut->array2.second ; ++ii )
-	std::cout << *(lOut->array2.first + ii ) << " ";
-  std::cout << std::endl;	
+  double bufferSize_s = 10;
+  bool pp_bRemoveDC = false, pp_bPreEmphasis = false, pp_bNormalizeRMS = false, pp_bLevelScaling = false, pp_bMiddleEarFiltering = false, pp_bUnityComp = true;
+  uint32_t pp_cutoffHzDC = 20;
+  middleEarModel pp_middleEarModel = _jepsen;
+  double pp_coefPreEmphasis = 0.97, pp_intTimeSecRMS = 0.5, pp_refSPLdB = 100;
 
-  std::cout << "right : ";
-  for ( std::size_t ii = 0 ; ii < rOut->array1.second ; ++ii )
-	std::cout << *(rOut->array1.first + ii ) << " ";
-  for ( std::size_t ii = 0 ; ii < rOut->array2.second ; ++ii )
-	std::cout << *(rOut->array2.first + ii ) << " ";
-  std::cout << std::endl;	
-    																					    
+  std::string errorMessage = "The correct usage is : ./TEST_preProc inFilePath outputName pp_bRemoveDC pp_cutoffHzDC pp_bPreEmphasis pp_coefPreEmphasis pp_bNormalizeRMS  pp_intTimeSecRMS pp_bLevelScaling pp_refSPLdB  pp_bMiddleEarFiltering  pp_middleEarModel pp_bUnityComp";
+
+	  switch ( argc ) {
+		  case 1:
+			break;
+		  case 2:
+			dataPath = argv[1];  
+			break;
+		  case 3:
+			dataPath = argv[1];
+			outputName = argv[2];
+			break;
+		  case 4:  
+			dataPath = argv[1];
+			outputName = argv[2];
+			pp_bRemoveDC = *(argv[3]) != '0';
+			break;
+		  case 5:
+			dataPath = argv[1];
+			outputName = argv[2];
+			pp_bRemoveDC = *(argv[3]) != '0';
+			pp_cutoffHzDC = atoi(argv[4]);
+			break;
+		  case 6:
+			dataPath = argv[1];
+			outputName = argv[2];
+			pp_bRemoveDC = *(argv[3]) != '0';
+			pp_cutoffHzDC = atoi(argv[4]);
+			pp_bPreEmphasis = *(argv[5]) != '0';
+			break;
+		  case 7:
+			dataPath = argv[1];
+			outputName = argv[2];
+			pp_bRemoveDC = *(argv[3]) != '0';
+			pp_cutoffHzDC = atoi(argv[4]);
+			pp_bPreEmphasis = *(argv[5]) != '0';
+			pp_coefPreEmphasis = atof(argv[6]);			
+			break;	
+		  case 8:
+			dataPath = argv[1];
+			outputName = argv[2];
+			pp_bRemoveDC = *(argv[3]) != '0';
+			pp_cutoffHzDC = atoi(argv[4]);
+			pp_bPreEmphasis = *(argv[5]) != '0';
+			pp_coefPreEmphasis = atof(argv[6]);	
+			pp_bNormalizeRMS = *(argv[7]) != '0';
+			break;
+		  case 9:
+			dataPath = argv[1];
+			outputName = argv[2];
+			pp_bRemoveDC = *(argv[3]) != '0';
+			pp_cutoffHzDC = atoi(argv[4]);
+			pp_bPreEmphasis = *(argv[5]) != '0';
+			pp_coefPreEmphasis = atof(argv[6]);	
+			pp_bNormalizeRMS = *(argv[7]) != '0';
+			pp_intTimeSecRMS = atof(argv[8]);	
+			break;
+		  case 10:
+			dataPath = argv[1];
+			outputName = argv[2];
+			pp_bRemoveDC = *(argv[3]) != '0';
+			pp_cutoffHzDC = atoi(argv[4]);
+			pp_bPreEmphasis = *(argv[5]) != '0';
+			pp_coefPreEmphasis = atof(argv[6]);	
+			pp_bNormalizeRMS = *(argv[7]) != '0';
+			pp_intTimeSecRMS = atof(argv[8]);	
+			pp_bLevelScaling = *(argv[9]) != '0';				
+			break;
+		  case 11:
+			dataPath = argv[1];
+			outputName = argv[2];
+			pp_bRemoveDC = *(argv[3]) != '0';
+			pp_cutoffHzDC = atoi(argv[4]);
+			pp_bPreEmphasis = *(argv[5]) != '0';
+			pp_coefPreEmphasis = atof(argv[6]);	
+			pp_bNormalizeRMS = *(argv[7]) != '0';
+			pp_intTimeSecRMS = atof(argv[8]);	
+			pp_bLevelScaling = *(argv[9]) != '0';
+			pp_refSPLdB = atof(argv[10]);						
+			break;
+		  case 12:
+			dataPath = argv[1];
+			outputName = argv[2];
+			pp_bRemoveDC = *(argv[3]) != '0';
+			pp_cutoffHzDC = atoi(argv[4]);
+			pp_bPreEmphasis = *(argv[5]) != '0';
+			pp_coefPreEmphasis = atof(argv[6]);	
+			pp_bNormalizeRMS = *(argv[7]) != '0';
+			pp_intTimeSecRMS = atof(argv[8]);	
+			pp_bLevelScaling = *(argv[9]) != '0';
+			pp_refSPLdB = atof(argv[10]);		
+			if ( strcmp("_lopezpoveda", argv[11]) == 0 ) pp_middleEarModel = _lopezpoveda;
+			break;
+		  case 13:
+			dataPath = argv[1];
+			outputName = argv[2];
+			pp_bRemoveDC = *(argv[3]) != '0';
+			pp_cutoffHzDC = atoi(argv[4]);
+			pp_bPreEmphasis = *(argv[5]) != '0';
+			pp_coefPreEmphasis = atof(argv[6]);	
+			pp_bNormalizeRMS = *(argv[7]) != '0';
+			pp_intTimeSecRMS = atof(argv[8]);	
+			pp_bLevelScaling = *(argv[9]) != '0';
+			pp_refSPLdB = atof(argv[10]);		
+			if ( strcmp("_lopezpoveda", argv[11]) == 0 ) pp_middleEarModel = _lopezpoveda;
+			pp_bUnityComp = *(argv[12]) != '0';
+			break;																							
+		  default:
+			throw new std::string(errorMessage);
+			break;			 
+	  }
+	  
+  int result = matFiles::readMatFile(dataPath.c_str(), earSignals, &fsHz);
+
+  if ( result == 0 ) {  
+	  std::shared_ptr <InputProc > inputSignal; 
+	  inputSignal.reset( new InputProc("input", fsHz, bufferSize_s, false) );
+
+	  std::shared_ptr <PreProc > ppSignal;
+	  ppSignal.reset( new PreProc("preProc", inputSignal, pp_bRemoveDC,
+															   pp_cutoffHzDC,
+															   pp_bPreEmphasis,
+															   pp_coefPreEmphasis,
+															   pp_bNormalizeRMS,
+															   pp_intTimeSecRMS,
+															   pp_bLevelScaling,
+															   pp_refSPLdB,
+															   pp_bMiddleEarFiltering,
+															   pp_middleEarModel,
+															   pp_bUnityComp ) );
+																							  
+																							  
+	  inputSignal->processChunk ( earSignals[0].data(), earSignals[0].size(), earSignals[1].data(), earSignals[1].size() );
+	  inputSignal->releaseChunk(); 
+	  
+	  ppSignal->processChunk ();
+	  ppSignal->releaseChunk();  	
+	  
+	  std::shared_ptr<twoCTypeBlock<double> > lOut = ppSignal->getLeftWholeBufferAccessor();
+	  std::shared_ptr<twoCTypeBlock<double> > rOut = ppSignal->getRightWholeBufferAccessor();
+  
+	  matFiles::writeTDSMatFile(outputName.c_str(), lOut, rOut, fsHz);
+  } else throw new std::string("Unable to read the inFilePath " + errorMessage);
+  																			    
   return 0;  
 }
 

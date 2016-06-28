@@ -19,3 +19,4 @@ config.sub
 depcomp
 install-sh
 missing
+results/
