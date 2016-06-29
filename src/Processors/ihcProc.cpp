@@ -4,40 +4,33 @@ using namespace openAFE;
 
 			void IHCProc::populateFilters( filterPtrVector& filters ) {
 
+				 filters.resize( this->fb_nChannels );
+
                  switch ( this->method ) {
 
                      case _joergensen:
-						 ihcFilter_l.resize( fb_nChannels ); ihcFilter_r.resize( fb_nChannels );
                          // First order butterworth filter @ 150Hz
-						 for ( size_t ii = 0 ; ii < fb_nChannels ; ++ii ) {
-
-						 }
-						 
+						 for ( size_t ii = 0 ; ii < fb_nChannels ; ++ii )
+							filters[ii].reset(new bwFilter( this->getFsIn(), 1, 150, _bwlp ) );
                          break;
 
                      case _dau:
-						 ihcFilter_l.resize( fb_nChannels ); ihcFilter_r.resize( fb_nChannels );
-                         // First order butterworth filter @ 150Hz
-						 for ( size_t ii = 0 ; ii < fb_nChannels ; ++ii ) {
-							 
-						 }
+                         // Second order butterworth filter @ 1000Hz
+						 for ( size_t ii = 0 ; ii < fb_nChannels ; ++ii )
+							filters[ii].reset(new bwFilter( this->getFsIn(), 2, 1000, _bwlp ) );						 
                          break;
 
                      case _breebart:
-                         // First order butterworth filter @ 2000Hz cascaded 5
-                         // times
-						 ihcFilter_l.resize( fb_nChannels ); ihcFilter_r.resize( fb_nChannels );
-                         // First order butterworth filter @ 150Hz
+                         // First order butterworth filter @ 2000Hz cascaded 5 times
 						 for ( size_t ii = 0 ; ii < fb_nChannels ; ++ii ) {
-							 
+							 // TODO : implement THIS
 						 }
                          break;
 
                      case _bernstein:
                          // Second order butterworth filter @ 425Hz
-						 ihcFilter_l.resize( fb_nChannels ); ihcFilter_r.resize( fb_nChannels );
 						 for ( size_t ii = 0 ; ii < fb_nChannels ; ++ii ) {
-							 
+							filters[ii].reset(new bwFilter( this->getFsIn(), 2, 425, _bwlp ) );
 						 }
                          break;
 
@@ -52,26 +45,42 @@ using namespace openAFE;
 
 			void IHCProc::processFilteringChannel ( bwFilterPtr filter, std::shared_ptr<twoCTypeBlock<double> > oneChannel ) {
 				// 0- Initialization
-			/*	size_t dim1 = oneChannel->array1.second;
+				size_t dim1 = oneChannel->array1.second;
 				size_t dim2 = oneChannel->array2.second;
 							
 				double* firstValue1 = oneChannel->array1.first;
 				double* firstValue2 = oneChannel->array2.first;
-			*/
+			
                  switch ( this->method ) {
 
                      case _joergensen:
-						
+						// TODO : implement THIS
 						break;
 					 case _dau:
+					 
+						// Halfwave rectification
+						if ( dim1 > 0 )
+							for ( size_t ii = 0 ; ii < dim1 ; ++ii )
+								*( firstValue1 + ii ) = fmax( *( firstValue1 + ii ), 0 );
+						if ( dim2 > 0 )
+							for ( size_t ii = 0 ; ii < dim2 ; ++ii )
+								*( firstValue2 + ii ) = fmax( *( firstValue2 + ii ), 0 );
+								
+						// Filtering
+						if ( dim1 > 0 )
+						    filter->exec( firstValue1, dim1, firstValue1 );
+						if ( dim2 > 0 )
+						    filter->exec( firstValue2, dim2, firstValue2 );
 
 					 	break;
 					 	
 					 case _breebart:
-					 
+						// TODO : implement THIS (filters are not initialized)
+
 					 	break;
 					 	
 					 case _bernstein:
+						// TODO : implement THIS
 
 					 	break;
 					 	
@@ -142,7 +151,7 @@ using namespace openAFE;
 					t.join();
 			}
 																
-			IHCProc::IHCProc (const std::string nameArg, std::shared_ptr<GammatoneProc > upperProcPtr, ihcMethod method ) : TFSProcessor<double > (nameArg, upperProcPtr->getFsOut(), upperProcPtr->getFsOut(), upperProcPtr->getBufferSize_s(), upperProcPtr->get_fb_nChannels(), "magnitude", _ihc) {
+			IHCProc::IHCProc (const std::string nameArg, std::shared_ptr<GammatoneProc > upperProcPtr, ihcMethod method ) : TFSProcessor<double > (nameArg, upperProcPtr->getFsOut(), upperProcPtr->getFsOut(), upperProcPtr->getBufferSize_s(), upperProcPtr->get_fb_nChannels(), _magnitude, _ihc) {
 					
 				this->fb_nChannels = upperProcPtr->get_fb_nChannels();
 				this->upperProcPtr = upperProcPtr;
@@ -152,8 +161,8 @@ using namespace openAFE;
 			
 			IHCProc::~IHCProc () {
 				
-				ihcFilter_l.clear();
-				ihcFilter_r.clear();
+				this->ihcFilter_l.clear();
+				this->ihcFilter_r.clear();
 			}
 			
 			void IHCProc::prepareForProcessing() {
@@ -167,11 +176,15 @@ using namespace openAFE;
 				// Appending the chunk to process (the processing must be done on the PMZ)
 				leftPMZ->appendChunk( this->upperProcPtr->getLeftLastChunkAccessor() );
 				rightPMZ->appendChunk( this->upperProcPtr->getRightLastChunkAccessor() );
+
 				std::vector<std::shared_ptr<twoCTypeBlock<double> > > l_PMZ = leftPMZ->getLastChunkAccesor();
 				std::vector<std::shared_ptr<twoCTypeBlock<double> > > r_PMZ = rightPMZ->getLastChunkAccesor();
 				
-				this->processLR( ihcFilter_l, l_PMZ );
-				this->processLR( ihcFilter_r, r_PMZ );				
+				std::thread leftThread( &IHCProc::processLR, this, std::ref(this->ihcFilter_l), l_PMZ );
+				std::thread rightThread( &IHCProc::processLR, this, std::ref(this->ihcFilter_r), r_PMZ );
+							
+				leftThread.join();                // pauses until left finishes
+				rightThread.join();               // pauses until right finishes			
 			}
 			
 			/* Comapres informations and the current parameters of two processors */
@@ -183,10 +196,10 @@ using namespace openAFE;
 			}
 
 			// getters
-			const ihcMethod IHCProc::get_ihc_method() {return this->method;}  
+			const ihcMethod IHCProc::get_ihc_method() {return this->method;}
 			const uint32_t IHCProc::get_ihc_nChannels() {return this->fb_nChannels;}
 
-			// setters			
+			// setters
 			void IHCProc::set_ihc_method(const ihcMethod arg) {this->method=arg; this->prepareForProcessing ();}
 
 			std::string IHCProc::get_upperProcName() {return this->upperProcPtr->getName();}

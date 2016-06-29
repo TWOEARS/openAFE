@@ -28,7 +28,7 @@ namespace openAFE {
 		std::vector<std::shared_ptr<CircularContainer<T> > > buffer;
 		std::vector<std::shared_ptr<twoCTypeBlock<T> > > lastChunkInfo, wholeBufferInfo, oldDataInfo;
 		
-		std::string scaling;
+		scalingType scaling;
 
 	public:
 
@@ -44,7 +44,7 @@ namespace openAFE {
 
 		TimeFrequencySignal( const uint32_t fs, const double bufferSize_s, std::size_t nChannel,
 							 const std::string argName = "tfRepresentation",
-							 std::string argScaling = "magnitude", channel cha = _mono) : Signal(fs, argName, bufferSize_s, cha) {
+							 scalingType argScaling = _magnitude, channel cha = _mono) : Signal(fs, argName, bufferSize_s, cha) {
 													
 			this->nChannel = nChannel;
 			this->scaling = argScaling;

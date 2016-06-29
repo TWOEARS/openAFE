@@ -29,6 +29,13 @@ namespace openAFE {
 				this->array2.first = toCopy->array2.first;
 				this->array2.second = toCopy->array2.second;
 			}
+			
+			T *getPtr( std::size_t index ) {
+				if ( array1.second >= index )
+					return array1.first + index;
+				else return array2.first + index - array1.second;
+			}			
+			
 	};
 };
 

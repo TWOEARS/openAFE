@@ -27,6 +27,9 @@ using namespace openAFE;
 					case _ild:
 					  this->hasTwoOutputs = false;
 					  break;
+					case _ratemap:
+					  this->hasTwoOutputs = true;
+					  break;					  
 					default:
 					  this->hasTwoOutputs = true;
 					  break;

@@ -14,7 +14,12 @@ namespace openAFE {
 		_left,
 		_right
 	};
-	  
+	
+	enum scalingType {
+		_magnitude,
+		_power
+	};
+		  
 	class Signal {
 	    		
 	protected:

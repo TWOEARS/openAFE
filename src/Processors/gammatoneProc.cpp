@@ -118,7 +118,7 @@ using namespace openAFE;
 																											 uint32_t fb_nGamma,
 																											 double fb_bwERBs
 				) : TFSProcessor<double > (nameArg, upperProcPtr->getFsOut(), upperProcPtr->getFsOut(), upperProcPtr->getBufferSize_s(), verifyParameters( fb_type, fb_lowFreqHz, fb_highFreqHz, fb_nERBs, fb_nChannels,		
-					fb_cfHz, fb_cfHz_length, fb_nGamma, fb_bwERBs), "magnitude", _gammatone) {
+					fb_cfHz, fb_cfHz_length, fb_nGamma, fb_bwERBs), _magnitude, _gammatone) {
 																											 
 				this->verifyParameters( fb_type, fb_lowFreqHz, fb_highFreqHz, fb_nERBs, fb_nChannels, fb_cfHz, fb_cfHz_length, fb_nGamma, fb_bwERBs);
 
@@ -137,16 +137,15 @@ using namespace openAFE;
 				// Appending the chunk to process (the processing must be done on the PMZ)
 				leftPMZ->appendChunk( this->upperProcPtr->getLeftLastChunkAccessor() );
 				rightPMZ->appendChunk( this->upperProcPtr->getRightLastChunkAccessor() );
+				
 				std::vector<std::shared_ptr<twoCTypeBlock<double> > > l_PMZ = leftPMZ->getLastChunkAccesor();
 				std::vector<std::shared_ptr<twoCTypeBlock<double> > > r_PMZ = rightPMZ->getLastChunkAccesor();
 				
-			/*	std::thread leftThread( &GammatoneProc::processLR, this->leftFilters, l_PMZ );
-				std::thread rightThread( &GammatoneProc::processLR, this->rightFilters, r_PMZ );
+				std::thread leftThread( &GammatoneProc::processLR, this, std::ref(this->leftFilters), l_PMZ );
+				std::thread rightThread( &GammatoneProc::processLR, this, std::ref(this->rightFilters), r_PMZ );
 							
 				leftThread.join();                // pauses until left finishes
-				rightThread.join();               // pauses until right finishes*/
-				this->processLR( this->leftFilters, l_PMZ );
-				this->processLR( this->rightFilters, r_PMZ );
+				rightThread.join();               // pauses until right finishes
 			}
 			
 			void GammatoneProc::prepareForProcessing () {

@@ -13,5 +13,7 @@ libprocessors_a_SOURCES += gammatoneProc.hpp
 libprocessors_a_SOURCES += gammatoneProc.cpp
 libprocessors_a_SOURCES += ihcProc.hpp
 libprocessors_a_SOURCES += ihcProc.cpp
+libprocessors_a_SOURCES += windowBasedProcs.hpp
+libprocessors_a_SOURCES += windowBasedProcs.cpp
 libprocessors_a_SOURCES += ildProc.hpp
 libprocessors_a_SOURCES += ildProc.cpp

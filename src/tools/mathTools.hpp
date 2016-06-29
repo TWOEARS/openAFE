@@ -3,7 +3,7 @@
 
 #define ERB_L 24.7
 #define ERB_Q 9.265
-#define EPSILON 0.00000001
+#define EPSILON 2.2204E-32
 
 #include <stdint.h>
 #include <vector>

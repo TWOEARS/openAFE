@@ -1,4 +1,4 @@
-bin_PROGRAMS = TEST_input TEST_preProc TEST_filterbank
+bin_PROGRAMS = TEST_input TEST_preProc TEST_filterbank TEST_ihc TEST_ild
 
 MATLAB_DIR = '/usr/local/MATLAB/R2015a'
 MATFILESLIB_LIBS = -lmat -lmx
@@ -19,3 +19,9 @@ TEST_preProc_LDADD = ../src/libopenAFE.la libmatFiles.a $(MATFILESLIB_LIBS)
 
 TEST_filterbank_SOURCES = TEST_filterbank.cpp
 TEST_filterbank_LDADD = ../src/libopenAFE.la libmatFiles.a $(MATFILESLIB_LIBS)
+
+TEST_ihc_SOURCES = TEST_ihc.cpp
+TEST_ihc_LDADD = ../src/libopenAFE.la libmatFiles.a $(MATFILESLIB_LIBS)
+
+TEST_ild_SOURCES = TEST_ild.cpp
+TEST_ild_LDADD = ../src/libopenAFE.la libmatFiles.a $(MATFILESLIB_LIBS)

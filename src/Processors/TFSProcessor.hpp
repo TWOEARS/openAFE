@@ -18,7 +18,7 @@ namespace openAFE {
 			
 		public:
 		
-			TFSProcessor (const std::string nameArg, const uint32_t fsIn, const uint32_t fsOut, const double bufferSize_s, size_t nChannel, std::string argScaling, procType typeArg) : Processor (bufferSize_s, fsIn, fsOut, nameArg, typeArg) {
+			TFSProcessor (const std::string nameArg, const uint32_t fsIn, const uint32_t fsOut, const double bufferSize_s, size_t nChannel, scalingType argScaling, procType typeArg) : Processor (bufferSize_s, fsIn, fsOut, nameArg, typeArg) {
 
 				/* Creating the output signals */
 				if ( this->hasTwoOutputs == true ) {

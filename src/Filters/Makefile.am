@@ -10,3 +10,6 @@ libfilters_a_SOURCES += bwFilter.hpp
 libfilters_a_SOURCES += bwFilter.cpp
 libfilters_a_SOURCES += GammatoneFilter.hpp
 libfilters_a_SOURCES += GammatoneFilter.cpp
+libfilters_a_SOURCES += leakyIntegratorFilter.hpp
+libfilters_a_SOURCES += leakyIntegratorFilter.cpp
+
