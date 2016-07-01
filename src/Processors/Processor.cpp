@@ -29,7 +29,10 @@ using namespace openAFE;
 					  break;
 					case _ratemap:
 					  this->hasTwoOutputs = true;
-					  break;					  
+					  break;
+					case _crosscorrelation:
+					  this->hasTwoOutputs = false;
+					  break;	  
 					default:
 					  this->hasTwoOutputs = true;
 					  break;

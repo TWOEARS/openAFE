@@ -21,6 +21,8 @@ libopenAFE_la_SOURCES += Processors/ihcProc.cpp
 libopenAFE_la_SOURCES += Processors/windowBasedProcs.cpp
 libopenAFE_la_SOURCES += Processors/ildProc.cpp
 libopenAFE_la_SOURCES += Processors/ratemap.cpp
+libopenAFE_la_SOURCES += Processors/windowBasedLAGProcs.cpp
+libopenAFE_la_SOURCES += Processors/crossCorrelation.cpp
 
 libopenAFE_la_LIBADD = tools/libtools.a
 libopenAFE_la_LIBADD += Signals/libsignals.a
@@ -37,6 +39,7 @@ signal_HEADERS += Signals/circularContainer.hpp
 signal_HEADERS += Signals/Signal.hpp
 signal_HEADERS += Signals/TimeDomainSignal.hpp
 signal_HEADERS += Signals/TimeFrequencySignal.hpp
+signal_HEADERS += Signals/CorrelationSignal.hpp
 
 filterdir=$(pkgincludedir)/Filters
 filter_HEADERS = Filters/GenericFilter.hpp
@@ -59,3 +62,6 @@ processor_HEADERS += Processors/ihcProc.hpp
 processor_HEADERS += Processors/windowBasedProcs.hpp
 processor_HEADERS += Processors/ildProc.hpp
 processor_HEADERS += Processors/ratemap.hpp
+processor_HEADERS += Processors/LAGProcessor.hpp
+processor_HEADERS += Processors/windowBasedLAGProcs.hpp
+processor_HEADERS += Processors/crossCorrelation.hpp

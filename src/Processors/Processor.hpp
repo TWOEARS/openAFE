@@ -15,7 +15,8 @@ namespace openAFE {
 		_gammatone,
 		_ihc,
 		_ild,
-		_ratemap		
+		_ratemap,
+		_crosscorrelation	
 	};
 	
 	/* The father class for all processors in rosAFE */
