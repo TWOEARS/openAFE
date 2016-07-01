@@ -36,12 +36,17 @@ namespace openAFE {
 		 * freshData : Distance between the newest and the oldest - unseen data
 		 * lastChunkSize : the size of last inputed chunk.
 		 * */
-		volatile uint32_t lastChunkSize;
+		volatile std::size_t lastChunkSize;
 		volatile long int freshData;
 						
 		inline
 		void push_back(const T& val) {
 			this->buffer.push_back(val);
+		}
+		
+		inline
+		void pop_front() {
+			this->buffer.pop_front();
 		}
 		
 		/* getLastChunkSize : return the number of samples, appended by the last chunk */
@@ -120,13 +125,13 @@ namespace openAFE {
 		 * signle c type vector, then setNow = true
 		 *
 		 * */
-		void push_chunk(T* firstValue, uint32_t dim, bool setNow = true) {
-			
+		void push_chunk(T* firstValue, std::size_t dim, bool setNow = true) {							
+
 			if ( setNow == true )
 				this->setLastChunkSize (dim);
 				
 			// Pushing back all values one by one.
-			for (unsigned int i = 0 ; i < dim ; ++i )
+			for ( std::size_t i = 0 ; i < dim ; ++i )
 				this->push_back( *(firstValue + i) );
 			
 			freshData += dim;
@@ -134,6 +139,11 @@ namespace openAFE {
 				freshData = this->getCapacity();
 		}
 
+		void pop_chunk( std::size_t dim ) {
+			for (unsigned int i = 0 ; i < dim ; ++i )
+				this->pop_front();
+		}
+		
 		void push_chunk(twoCTypeBlockPtr inChunk) {	
 			
 			/* The first array */
@@ -144,6 +154,11 @@ namespace openAFE {
 				this->push_chunk( inChunk->array2.first, inChunk->array2.second, false );
 			/* The total size of the last chunk */
 			this->setLastChunkSize( inChunk->getSize() );
+		}
+		
+		/* Linearize the internal buffer into a continuous array. */
+		T* linearizeBuffer() {
+			return this->buffer.linearize();
 		}
 		
 		twoCTypeBlockPtr getLastChunkAccesor() {
@@ -311,6 +326,11 @@ namespace openAFE {
 		void clear() noexcept {
 			
 			this->buffer.clear();
+		}
+		
+		/* Get the number of elements currently stored in the circular_buffer. */
+		std::size_t getSize() {
+			return this->buffer.size();
 		}								
 	};
 };

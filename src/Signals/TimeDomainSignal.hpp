@@ -38,7 +38,7 @@ namespace openAFE {
 			this->oldDataInfo.reset();
 		}
 		
-		void appendTChunk( T* inChunk, size_t dim ) {							
+		void appendTChunk( T* inChunk, size_t dim ) {
 			this->buffer->push_chunk( inChunk, dim );
 		}
 		

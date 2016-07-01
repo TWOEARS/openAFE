@@ -1,171 +1,151 @@
-#include "ildProc.hpp"
+#include "ratemap.hpp"
 
 using namespace openAFE;
 
-			uint32_t ILDProc::calcFsOut( double ild_hSizeSec ) {
-				return 1 / ild_hSizeSec;
+			void Ratemap::populateFilters( filterPtrVector& filterVec, std::size_t numberOfChannels, double fs ) {
+							
+				filterVec.resize(numberOfChannels);
+
+				for ( std::size_t ii = 0 ; ii < numberOfChannels ; ++ii )
+					filterVec[ii].reset( new leakyIntegratorFilter( fs, this->decaySec ) );
+			}
+			
+			void Ratemap::prepareForProcessing() {
+				
+				this->populateFilters( rmFilter_l, this->get_nChannels(), this->getFsIn() );
+				this->populateFilters( rmFilter_r, this->get_nChannels(), this->getFsIn() );				
 			}
 
-			void ILDProc::prepareForProcessing() {
-            
-				// Compute internal parameters
-				this->ild_wSize = 2 * round( this->ild_wSizeSec * this->getFsIn() / 2 );
-				this->ild_hSize = round( this->ild_hSizeSec * this->getFsIn() );		
-		
-				switch ( this->ild_wname ) {
-					case _hamming: 
-						this->win = hamming( this->ild_wSize );
+			void Ratemap::processChannel( double* firstValue_l, double* firstValue_r, double *resultLeft, double *resultRight ) {
+
+				switch( this->scailing) {
+					
+					case _magnitude:
+						multiplication( this->win.data(), firstValue_l, this->wSize, firstValue_l );
+						multiplication( this->win.data(), firstValue_r, this->wSize, firstValue_r );
+								
+						*(resultLeft) = mean( firstValue_l, this->wSize );
+						*(resultRight) = mean( firstValue_r, this->wSize );
+						
 						break;
-					case _hanning: 
-						this->win = hanning( this->ild_wSize );
+						
+					case _power:
+						multiplication( this->win.data(), firstValue_l, this->wSize, firstValue_l );
+						multiplication( this->win.data(), firstValue_r, this->wSize, firstValue_r );
+							
+						*resultLeft = meanSquare( firstValue_l, this->wSize );
+						*resultRight = meanSquare( firstValue_r, this->wSize );
+						
 						break;
-					case _hann: 
-						this->win = hann( this->ild_wSize );
-						break;
-					case _blackman: 
-						this->win = blackman( this->ild_wSize );
-						break;
-					case _triang: 
-						this->win = triang( this->ild_wSize );
-						break;
-					case _sqrt_win: 
-						this->win = sqrt_win( this->ild_wSize );
-						break;
+						
 					default:
-						this->win.resize( this->ild_wSize, 0 );
 						break;
 				}
 				
-				this->zerosAccecor.reset( new twoCTypeBlock<double>() );
+				std::cout << "resultLeft : " << *resultLeft << " resultRight : " << *resultRight << std::endl;
+				sleep(3);
 			}
-
-			void ILDProc::processChannel( double* firstValue_l, double* firstValue_r, std::shared_ptr<twoCTypeBlock<double> > PMZ, size_t ii ) {
+			
+			Ratemap::Ratemap (const std::string nameArg, std::shared_ptr<IHCProc > upperProcPtr, double wSizeSec, double hSizeSec, scalingType scailingArg, double decaySec, windowType wname  )
+			: WindowBasedProcs (nameArg, upperProcPtr, _ratemap, wSizeSec, hSizeSec, wname, scailingArg ) {
 				
-				multiplication( this->win.data(), firstValue_l, this->ild_wSize, firstValue_l );
-				multiplication( this->win.data(), firstValue_r, this->ild_wSize, firstValue_r );
-							
-				double mSq_l = meanSquare( firstValue_l, this->ild_wSize );
-				double mSq_r = meanSquare( firstValue_r, this->ild_wSize );
-							
-				if ( PMZ->array1.second >= ii )
-					*(PMZ->array1.first + ii ) = ild( mSq_r, mSq_l );
-				else
-					*(PMZ->array2.first + ( ii - PMZ->array1.second ) ) = ild( mSq_r, mSq_l );
-			}
-					
-			ILDProc::ILDProc (const std::string nameArg, std::shared_ptr<IHCProc > upperProcPtr, double ild_wSizeSec, double ild_hSizeSec, ildWindowType ild_wname  )
-			: TFSProcessor<double > (nameArg, upperProcPtr->getFsOut(), this->calcFsOut( ild_hSizeSec ), upperProcPtr->getBufferSize_s(), upperProcPtr->get_ihc_nChannels(), "magnitude", _ratemap) {
-					
-				this->fb_nChannels = upperProcPtr->get_ihc_nChannels();
+				this->decaySec = decaySec;
+				this->scailing = scailingArg;
 				
-				this->upperProcPtr = upperProcPtr;
-				this->ild_wSizeSec = ild_wSizeSec;
-				this->ild_hSizeSec = ild_hSizeSec;
-				this->ild_wname = ild_wname;
-								
-				this->buffer_l.reset( new TimeFrequencySignal<double>( this->getFsIn(), this->getBufferSize_s(), this->fb_nChannels, "inner buffer", "magnitude", _left) );
-				this->buffer_r.reset( new TimeFrequencySignal<double>( this->getFsIn(), this->getBufferSize_s(), this->fb_nChannels, "inner buffer", "magnitude", _right) );
-								
 				this->prepareForProcessing();
 			}
 
-			ILDProc::~ILDProc () {
+			Ratemap::~Ratemap () {
 				
-				this->win.clear();
-				this->buffer_l.reset();
-				this->buffer_r.reset();
 			}
 			
-			void ILDProc::processChunk () {				
+			void Ratemap::processChunk () {	
+
 				this->setNFR ( this->upperProcPtr->getNFR() );
-							
+											
 				// Append provided input to the buffer
 				this->buffer_l->appendChunk( this->upperProcPtr->getLeftLastChunkAccessor() );
 				this->buffer_r->appendChunk( this->upperProcPtr->getRightLastChunkAccessor() );
-				
+
 				std::vector<std::shared_ptr<twoCTypeBlock<double> > > l_innerBuffer = buffer_l->getLastChunkAccesor();
 				std::vector<std::shared_ptr<twoCTypeBlock<double> > > r_innerBuffer = buffer_r->getLastChunkAccesor();
 				
+				std::size_t dim1_l, dim2_l, dim1_r, dim2_r;
+				double *firstValue1_l, *firstValue2_l, *firstValue1_r, *firstValue2_r;
+				
+				// FILTERING
+				for ( std::size_t ii = 0 ; ii < this->get_nChannels() ; ++ii ) {
+
+					// LEFT						
+					dim1_l = l_innerBuffer[ii]->array1.second;
+					dim2_l = l_innerBuffer[ii]->array2.second;
+							
+					firstValue1_l = l_innerBuffer[ii]->array1.first;
+					firstValue2_l = l_innerBuffer[ii]->array2.first;
+					
+					if ( dim1_l > 0 )
+						rmFilter_l[ii]->exec ( firstValue1_l, dim1_l, firstValue1_l );
+					if ( dim2_l > 0 )
+						rmFilter_l[ii]->exec ( firstValue2_l, dim2_l, firstValue2_l );
+					
+					// RIGHT	
+					dim1_r = r_innerBuffer[ii]->array1.second;
+					dim2_r = r_innerBuffer[ii]->array2.second;
+							
+					firstValue1_r = r_innerBuffer[ii]->array1.first;
+					firstValue2_r = r_innerBuffer[ii]->array2.first;
+					
+					if ( dim1_r > 0 )
+						rmFilter_r[ii]->exec ( firstValue1_r, dim1_r, firstValue1_r );
+					if ( dim2_r > 0 )
+						rmFilter_r[ii]->exec ( firstValue2_r, dim2_r, firstValue2_r );											
+					
+				}
+							
+				// The buffer should be linearized for windowing.
+				this->buffer_l->linearizeBuffer();
+				this->buffer_r->linearizeBuffer();
+								
+				l_innerBuffer = buffer_l->getWholeBufferAccesor();
+				r_innerBuffer = buffer_r->getWholeBufferAccesor();
+				
 				// Quick control of dimensionality
 				assert( l_innerBuffer.size() == r_innerBuffer.size() );
-				
-				uint32_t nSamples = l_innerBuffer[0]->getSize();
-				
-				for ( std::size_t ii = 0 ; ii < l_innerBuffer.size() ; ++ii ) {
-					assert ( nSamples == r_innerBuffer[ii]->getSize() );
-					assert ( l_innerBuffer[ii]->getSize() == nSamples );
-				}
 
-				std::size_t nSamples_1 = l_innerBuffer[0]->array1.second;
-				std::size_t nSamples_2 = l_innerBuffer[0]->array2.second;
-
-				// How many frames are in the buffered input?
-				std::size_t nFrames_1 = 0, nFrames_2 = 0;
-
-				if ( nSamples_1 > this->ild_wSize ) 
-					nFrames_1 = floor( ( nSamples_1 - ( this->ild_wSize - this->ild_hSize ) ) / this->ild_hSize );
-				if ( nSamples_2 > this->ild_wSize ) 
-					nFrames_2 = floor( ( nSamples_2 - ( this->ild_wSize - this->ild_hSize ) ) / this->ild_hSize );
-
+				std::size_t totalFrames = floor( ( this->buffer_l->getSize() - ( this->wSize - this->hSize ) ) / this->hSize );
+								
 				// Creating a chunk of zeros.
-				this->zerosVector.resize( nFrames_1 + nFrames_2, 0 );
-
+				this->zerosVector.resize( totalFrames, 0 );
+				
+				// Creating a accesor to it (The data on zerosVector is continious)
 				this->zerosAccecor->array1.first = zerosVector.data(); this->zerosAccecor->array2.first = nullptr;
 				this->zerosAccecor->array1.second = zerosVector.size(); this->zerosAccecor->array2.second = 0;
-				
 
 				// Appending this chunk to all channels of the PMZ.
 				leftPMZ->appendChunk( zerosAccecor );
-				std::vector<std::shared_ptr<twoCTypeBlock<double> > > PMZ = leftPMZ->getLastChunkAccesor();
-				
-				// Processing on PMZ
-            	if ( nFrames_1 > 0 ) {
-					// Loop on the time frame				
-					for ( size_t ii = 0 ; ii < nFrames_1 ; ++ii ) {
-						// Get start and end indexes for the current frame
-						uint32_t n_start = ii * this->ild_hSize;
-						// uint32_t n_end = ii * this->ild_hSize + this->ild_wSize - 1;
-					
-						// Loop on the channel
-						for ( size_t jj = 0 ; jj < this->fb_nChannels ; ++jj ) {
-							processChannel( l_innerBuffer[jj]->array1.first + n_start, r_innerBuffer[jj]->array1.first + n_start, PMZ[jj], ii );
-						}
-						
-			/*			std::vector<std::thread> threads;
-						for ( size_t jj = 0 ; ii < this->fb_nChannels ; ++jj )
-							threads.push_back(std::thread( &ILDProc::processChannel, this, l_innerBuffer[jj]->array1.first + n_start, r_innerBuffer[jj]->array1.first + n_start, PMZ[jj], ii ));
+				rightPMZ->appendChunk( zerosAccecor );
+				std::vector<std::shared_ptr<twoCTypeBlock<double> > > lastChunkOfPMZ = leftPMZ->getLastChunkAccesor();
+				std::vector<std::shared_ptr<twoCTypeBlock<double> > > rightChunkOfPMZ = rightPMZ->getLastChunkAccesor();
 
-						// Waiting to join the threads
-						for (auto& t : threads)
-							t.join();						
-			*/			
-						
-						
-					}
+				std::size_t ii;
+				uint32_t n_start;
+				for ( ii = 1 /* TODO : 0 */ ; ii < totalFrames ; ++ii ) {
+
+					n_start = ii * this->hSize;
+
+					// Loop on the channels : Got better run-time results when not creating threads.
+					for ( std::size_t jj = 0 ; jj < this->fb_nChannels ; ++jj )
+						processChannel( l_innerBuffer[jj]->array1.first + n_start, r_innerBuffer[jj]->array1.first + n_start, lastChunkOfPMZ[jj]->getPtr(ii), rightChunkOfPMZ[jj]->getPtr(ii) );
 				}
-				
+
+				this->buffer_l->pop_chunk( ii * this->hSize );
+				this->buffer_r->pop_chunk( ii * this->hSize );
 			}
 			
-			/* Comapres informations and the current parameters of two processors */
-			bool ILDProc::operator==( ILDProc& toCompare ) {
-				if ( this->compareBase( toCompare ) )
-					if ( ( this->get_ild_wSizeSec() == toCompare.get_ild_wSizeSec() ) and 
-						 ( this->get_ild_hSizeSec() == toCompare.get_ild_hSizeSec() ) and 					
-						 ( this->get_ild_wname() == toCompare.get_ild_wname() ) )				     		     			     
-						return true;
-				return false;
-			}
-
 			// getters
-			const double ILDProc::get_ild_wSizeSec() {return this->ild_wSizeSec;}
-			const double ILDProc::get_ild_hSizeSec() {return this->ild_hSizeSec;}
-			const ildWindowType ILDProc::get_ild_wname() {return this->ild_wname;}
-			
-			const uint32_t ILDProc::get_ild_nChannels() {return this->fb_nChannels;}
-
+			const double Ratemap::get_rm_decaySec() {return this->decaySec;}
+			const scalingType Ratemap::get_rm_scailing() {return this->scailing;}
+  
 			// setters			
-			void ILDProc::set_ild_wSizeSec(const double arg) {this->ild_wSizeSec=arg; this->prepareForProcessing ();}
-			void ILDProc::set_ild_hSizeSec(const double arg) {this->ild_hSizeSec=arg; this->prepareForProcessing ();}
-			void ILDProc::set_ild_wname(const ildWindowType arg) {this->ild_wname=arg; this->prepareForProcessing ();}
-
-			std::string ILDProc::get_upperProcName() {return this->upperProcPtr->getName();}
+			void Ratemap::set_rm_decaySec(const double arg) {this->decaySec=arg; this->prepareForProcessing ();}
+			void Ratemap::set_rm_scailing(const scalingType arg) {this->scailing=arg; this->prepareForProcessing ();}

@@ -20,6 +20,7 @@ libopenAFE_la_SOURCES += Processors/gammatoneProc.cpp
 libopenAFE_la_SOURCES += Processors/ihcProc.cpp
 libopenAFE_la_SOURCES += Processors/windowBasedProcs.cpp
 libopenAFE_la_SOURCES += Processors/ildProc.cpp
+libopenAFE_la_SOURCES += Processors/ratemap.cpp
 
 libopenAFE_la_LIBADD = tools/libtools.a
 libopenAFE_la_LIBADD += Signals/libsignals.a
@@ -57,3 +58,4 @@ processor_HEADERS += Processors/gammatoneProc.hpp
 processor_HEADERS += Processors/ihcProc.hpp
 processor_HEADERS += Processors/windowBasedProcs.hpp
 processor_HEADERS += Processors/ildProc.hpp
+processor_HEADERS += Processors/ratemap.hpp

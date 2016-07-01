@@ -54,7 +54,8 @@ using namespace openAFE;
 						leftThread.join();                // pauses until left finishes
 						rightThread.join();               // pauses until right finishes
 					}
-				}			
+				}
+	
 			}
 			
 			void InputProc::processChunk () { }

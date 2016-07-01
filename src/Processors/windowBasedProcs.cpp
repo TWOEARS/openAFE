@@ -7,7 +7,7 @@ using namespace openAFE;
 			}
 
 			void WindowBasedProcs::prepareForProcessing() {
-            
+
 				// Compute internal parameters
 				this->wSize = 2 * round( this->wSizeSec * this->getFsIn() / 2 );
 				this->hSize = round( this->hSizeSec * this->getFsIn() );		

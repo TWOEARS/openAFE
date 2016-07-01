@@ -23,7 +23,7 @@ int main(int argc, char **argv) {
 
   if ( result == 0 ) {
 	  std::shared_ptr <InputProc > inputP; 
-	  inputP.reset( new InputProc("input", fsHz, 10 ) );
+	  inputP.reset( new InputProc("input", fsHz, 10, false ) );
 
 	  std::shared_ptr <PreProc > ppP;
 	  ppP.reset( new PreProc("preProc", inputP ) );

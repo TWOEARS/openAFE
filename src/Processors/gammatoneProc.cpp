@@ -81,11 +81,12 @@ using namespace openAFE;
 							
 				double* firstValue1 = oneChannel->array1.first;
 				double* firstValue2 = oneChannel->array2.first;
-													
+				
 				std::vector< std::complex<double > > tmpComplex;
 				if ( dim1 > 0 ) {
 					tmpComplex.resize(dim1, 0);
-					oneFilter->exec( firstValue1, dim1, tmpComplex.data() );							
+					oneFilter->exec( firstValue1, dim1, tmpComplex.data() );
+														
 					for ( std::size_t ii = 0 ; ii < dim1 ; ++ii )
 						*( firstValue1 + ii ) = tmpComplex[ii].real() * 2;
 				}

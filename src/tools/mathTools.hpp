@@ -108,6 +108,14 @@ namespace openAFE {
 		}
 
 		template <typename T = double>
+		T mean( T* firstValue_src, size_t dim ) {
+			T sum = 0;
+			for ( size_t i = 0 ; i < dim ; ++i )
+				sum += *( firstValue_src + i );
+			return sum / dim;
+		}
+		
+		template <typename T = double>
 		T meanSquare( T* firstValue_src, size_t dim ) {
 			T sum = 0;
 			for ( size_t i = 0 ; i < dim ; ++i )

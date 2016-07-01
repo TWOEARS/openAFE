@@ -17,3 +17,5 @@ libprocessors_a_SOURCES += windowBasedProcs.hpp
 libprocessors_a_SOURCES += windowBasedProcs.cpp
 libprocessors_a_SOURCES += ildProc.hpp
 libprocessors_a_SOURCES += ildProc.cpp
+libprocessors_a_SOURCES += ratemap.hpp
+libprocessors_a_SOURCES += ratemap.cpp

@@ -81,6 +81,7 @@ using namespace openAFE;
 							*(firstValue_l + i ) /= normFactor;
 							*(firstValue_r + i ) /= normFactor;
 						}
+												
 					}
 					
 					// 4- Level Scaling
@@ -115,7 +116,7 @@ using namespace openAFE;
 						//	TODO 
 					}
 													
-					// Processed data is on PMZ					
+					// Processed data is on PMZ
 			}
 		
 			/* PreProc */

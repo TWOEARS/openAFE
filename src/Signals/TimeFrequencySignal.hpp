@@ -110,6 +110,23 @@ namespace openAFE {
 				this->buffer[ii]->reset();
 		}		
 
+		void pop_chunk ( std::size_t numberOfFrames ) {
+			for ( std::size_t ii = 0 ; ii < this->nChannel ; ++ii )
+				this->buffer[ii]->pop_chunk( numberOfFrames );
+		}
+		
+		/* Linearize the internal buffer into a continuous array.
+		 * Get the data with getWholeBufferAccesor() just after calling this function
+		 */
+		void linearizeBuffer(){
+			for ( std::size_t ii = 0 ; ii < this->nChannel ; ++ii )
+				this->buffer[ii]->linearizeBuffer();			
+		}
+		
+		std::size_t getSize() {
+			return this->buffer[0]->getSize();
+		}
+		
 	}; /* class TimeFrequencySignal */
 };	/* namespace openAFE */
 
