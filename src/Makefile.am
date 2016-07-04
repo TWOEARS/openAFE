@@ -2,6 +2,7 @@ SUBDIRS = tools Signals Filters Processors
 AUTOMAKE_OPTIONS = subdir-objects
 
 AM_CXXFLAGS=$(CPPFLAGS)
+AM_CXXFLAGS+= -lfftw3 -lm
 
 @LTLIBOBJS@
 lib_LTLIBRARIES = libopenAFE.la

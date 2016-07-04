@@ -19,13 +19,14 @@ namespace openAFE {
 		private:
 
             double maxDelaySec; // Maximum delay in cross-correlation computation (s)
+            std::size_t maxLag;
             std::vector<double > lags; // Vector of lags at which cross-correlation is computed
 
 			std::size_t getNLags( double maxDelaySec, double fs );
 
 			void prepareForProcessing();
 
-			void processChannel( double* firstValue_l, double* firstValue_r, double *result );
+			std::vector<double> processChannel( double* firstValue_l, double* firstValue_r );
 			
 		public:
 		
@@ -34,15 +35,14 @@ namespace openAFE {
 			~CrossCorrelation ();
 			
 			void processChunk ();
-/*			
+			
 			// getters
 			const double get_cc_maxDelaySec();
-			const std::vector<double >& get_cc_lags();
+			const double *get_cc_lags();
+			const std::size_t get_cc_lags_size();
   
 			// setters			
 			void set_cc_maxDelaySec(const double arg);
-			void set_cc_lags(const std::vector<double >& arg);
-*/
 			
 	}; /* class CrossCorrelation */
 }; /* namespace openAFE */

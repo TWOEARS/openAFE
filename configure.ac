@@ -4,7 +4,7 @@ AC_LANG(C++)
 AC_CONFIG_MACRO_DIR([m4])
 have_pthreads=no
 AC_SEARCH_LIBS([pthread_create], [pthread], [have_pthreads=yes])
-AC_CHECK_HEADERS([string.h memory.h stdlib.h])
+AC_CHECK_HEADERS([string.h memory.h stdlib.h fftw3.h])
 
 if test "x${have_pthreads}" = "xyes"; then
   AC_CHECK_HEADERS([pthread.h], [], [have_pthreads=no])

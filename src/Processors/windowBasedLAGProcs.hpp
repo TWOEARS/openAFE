@@ -28,7 +28,7 @@ namespace openAFE {
 			uint64_t wSize;															// Window duration in samples
 			uint64_t hSize;															// Step size between windows in samples
 			std::vector<double> win;         										// Window vector
-			std::shared_ptr <CorrelationSignal<double> > buffer_l, buffer_r;    	// Buffered input signals
+			std::shared_ptr <TimeFrequencySignal<double> > buffer_l, buffer_r;    	// Buffered input signals
 
 			uint32_t fb_nChannels;
 			uint32_t nLags;
@@ -36,8 +36,8 @@ namespace openAFE {
 			std::shared_ptr<IHCProc > upperProcPtr;
 
 			/* Will be used to append to PMZ */
-			std::vector<std::vector<double> > zerosVector;
-			std::vector<std::shared_ptr<twoCTypeBlock<double> > > zerosAccecor;
+			std::vector<double> zerosVector;
+			std::shared_ptr<twoCTypeBlock<double> > zerosAccecor;
 						
 			// Output sampling frequency;
 			uint32_t calcFsOut( double hSizeSec );

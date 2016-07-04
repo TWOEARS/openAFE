@@ -22,8 +22,8 @@ namespace openAFE {
 			FFTEngine( std::size_t N );
 			~FFTEngine( );
 			
-			std::complex<double> *fft( *std::complex<double>, std::size_t N );
-			std::complex<double> *ifft( *std::complex<double>, std::size_t N );
+			std::complex<double> fft( std::complex<double> *inVect, std::size_t N );
+			std::complex<double> ifft( *td::complex<double> *inVect, std::size_t N );
 
 	}; // class FFTEngine
 }; // namespace openAFE

@@ -19,6 +19,8 @@ namespace matFiles {
 	int writeTDSMatFile(const char *file, std::shared_ptr<openAFE::twoCTypeBlock<double> > left, std::shared_ptr<openAFE::twoCTypeBlock<double> > right, double fsHz);
 
 	int writeTFSMatFile(const char *file, std::vector<std::shared_ptr<openAFE::twoCTypeBlock<double> > >& left, std::vector<std::shared_ptr<openAFE::twoCTypeBlock<double> > >& right, double fsHz);
+
+	int writeXCORRMatFile(const char *file, std::vector<std::vector<std::shared_ptr<openAFE::twoCTypeBlock<double> > > >& left, std::vector<std::vector<std::shared_ptr<openAFE::twoCTypeBlock<double> > > >& right, double fsHz);
 	
 }; /* namespace matFiles */
 

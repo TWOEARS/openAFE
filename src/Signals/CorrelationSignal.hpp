@@ -39,7 +39,7 @@ namespace openAFE {
 													
 			this->nChannel = nChannel;
 			this->nLags = nLags;
-			
+						
 			buffer.resize( this->nChannel );
 			lastChunkInfo.resize( this->nChannel );
 			wholeBufferInfo.resize( this->nChannel );
@@ -51,15 +51,16 @@ namespace openAFE {
 				wholeBufferInfo[ii].resize( this->nLags );
 				oldDataInfo[ii].resize( this->nLags );
 			}
-						
-			for ( std::size_t ii = 0 ; ii < this->nLags ; ++ii ) {
-				for ( std::size_t jj = 0 ; jj < this->nChannel ; ++jj ) {
+
+			for ( std::size_t ii = 0 ; ii < this->nChannel ; ++ii ) {
+				for ( std::size_t jj = 0 ; jj < this->nLags ; ++jj ) {
 					buffer[ii][jj].reset( new CircularContainer<T>( this->bufferSizeSamples ) );
 					lastChunkInfo[ii][jj].reset( new twoCTypeBlock<T> );
 					wholeBufferInfo[ii][jj].reset( new twoCTypeBlock<T> );
 					oldDataInfo[ii][jj].reset( new twoCTypeBlock<T> );
 				}
-			}
+			}			
+
 		}
 
 		/* Calls automatically Signal's destructor */
@@ -68,6 +69,12 @@ namespace openAFE {
 			this->lastChunkInfo.clear();
 			this->wholeBufferInfo.clear();
 			this->oldDataInfo.clear();
+		}
+
+		void appendChunk( std::shared_ptr<twoCTypeBlock<T> > inChunk ) {
+			for ( std::size_t ii = 0 ; ii < this->nChannel ; ++ii )
+				for ( std::size_t jj = 0 ; jj < this->nLags ; ++jj )
+					buffer[ii][jj]->push_chunk( inChunk );
 		}
 		
 		void appendChunk( std::vector<std::shared_ptr<twoCTypeBlock<T> > > inChunk ) {
@@ -82,9 +89,9 @@ namespace openAFE {
 					buffer[ii][jj]->push_chunk( inChunk[ii][jj] );
 		}
 				
-		std::vector<std::shared_ptr<twoCTypeBlock<T> > >& getLastChunkAccesor() {
+		std::vector<std::vector<std::shared_ptr<twoCTypeBlock<T> > > >& getLastChunkAccesor() {
 			for ( std::size_t ii = 0 ; ii < this->nChannel ; ++ii ) {
-				for ( std::size_t jj = 0 ; jj < this->nChannel ; ++jj ) {
+				for ( std::size_t jj = 0 ; jj < this->nLags ; ++jj ) {
 					this->buffer[ii][jj]->calcLastChunk();
 					this->lastChunkInfo[ii][jj]->setData( this->buffer[ii][jj]->getLastChunkAccesor() );
 				}
@@ -92,9 +99,9 @@ namespace openAFE {
 			return this->lastChunkInfo;
 		}
 		
-		std::vector<std::shared_ptr<twoCTypeBlock<T> > >& getWholeBufferAccesor() {
+		std::vector<std::vector<std::shared_ptr<twoCTypeBlock<T> > > >& getWholeBufferAccesor() {
 			for ( std::size_t ii = 0 ; ii < this->nChannel ; ++ii ) {
-				for ( std::size_t jj = 0 ; jj < this->nChannel ; ++jj ) {				
+				for ( std::size_t jj = 0 ; jj < this->nLags ; ++jj ) {				
 					this->buffer[ii][jj]->calcWholeBuffer();
 					this->wholeBufferInfo[ii][jj]->setData( this->buffer[ii][jj]->getWholeBufferAccesor() );
 				}
@@ -102,9 +109,9 @@ namespace openAFE {
 			return this->wholeBufferInfo;
 		}
 
-		std::vector<std::shared_ptr<twoCTypeBlock<T> > >& getOldDataAccesor() {
+		std::vector<std::vector<std::shared_ptr<twoCTypeBlock<T> > > >& getOldDataAccesor() {
 			for ( std::size_t ii = 0 ; ii < this->nChannel ; ++ii ) {
-				for ( std::size_t jj = 0 ; jj < this->nChannel ; ++jj ) {				
+				for ( std::size_t jj = 0 ; jj < this->nLags ; ++jj ) {				
 					this->buffer[ii][jj]->calcOldData();
 					this->oldDataInfo[ii][jj]->setData( this->buffer[ii][jj]->getOldDataAccesor() );
 				}
@@ -121,7 +128,7 @@ namespace openAFE {
 
 		void pop_chunk ( std::size_t numberOfFrames ) {
 			for ( std::size_t ii = 0 ; ii < this->nChannel ; ++ii )
-				for ( std::size_t jj = 0 ; jj < this->nChannel ; ++jj )
+				for ( std::size_t jj = 0 ; jj < this->nLags ; ++jj )
 					this->buffer[ii][jj]->pop_chunk( numberOfFrames );
 		}
 		
@@ -130,11 +137,14 @@ namespace openAFE {
 		 */
 		void linearizeBuffer() {
 			for ( std::size_t ii = 0 ; ii < this->nChannel ; ++ii )
-				for ( std::size_t jj = 0 ; jj < this->nChannel ; ++jj )
-					this->buffer[ii][jj]->linearizeBuffer();			
+				for ( std::size_t jj = 0 ; jj < this->nLags ; ++jj )
+					this->buffer[ii][jj]->linearizeBuffer();
 		}
 		
 		std::size_t getSize() {
+			std::cout << this->buffer.size() << std::endl; 
+			std::cout << this->buffer[0].size() << std::endl; 
+
 			return this->buffer[0][0]->getSize();
 		}
 		

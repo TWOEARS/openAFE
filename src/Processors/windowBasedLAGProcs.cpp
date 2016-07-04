@@ -36,11 +36,10 @@ using namespace openAFE;
 						break;
 				}
 				
-				for ( std::size_t ii = 0 ; ii < nLags ; ++ii )
-					this->zerosAccecor[ii].reset( new twoCTypeBlock<double>() );
+				this->zerosAccecor.reset( new twoCTypeBlock<double>() );
 			}
 			
-			WindowBasedLAGProcs::WindowBasedLAGProcs (const std::string nameArg, std::shared_ptr<IHCProc > upperProcPtr, procType typeOfThisProc, std::size_t nLag, double wSizeSec, double hSizeSec, windowType wname )
+			WindowBasedLAGProcs::WindowBasedLAGProcs (const std::string nameArg, std::shared_ptr<IHCProc > upperProcPtr, procType typeOfThisProc, std::size_t nLags, double wSizeSec, double hSizeSec, windowType wname )
 			: LAGProcessor<double > (nameArg, upperProcPtr->getFsOut(), this->calcFsOut( hSizeSec ), upperProcPtr->getBufferSize_s(), upperProcPtr->get_ihc_nChannels(), nLags, typeOfThisProc) {
 					
 				this->fb_nChannels = upperProcPtr->get_ihc_nChannels();
@@ -49,9 +48,9 @@ using namespace openAFE;
 				this->wSizeSec = wSizeSec;
 				this->hSizeSec = hSizeSec;
 				this->wname = wname;
-
-				this->buffer_l.reset( new CorrelationSignal<double>( this->getFsIn(), this->getBufferSize_s(), this->fb_nChannels, nLags, "inner buffer", _left) );
-				this->buffer_r.reset( new CorrelationSignal<double>( this->getFsIn(), this->getBufferSize_s(), this->fb_nChannels, nLags, "inner buffer", _right) );
+		
+				this->buffer_l.reset( new TimeFrequencySignal<double>( this->getFsIn(), this->getBufferSize_s(), this->fb_nChannels, "inner buffer", _magnitude, _left) );
+				this->buffer_r.reset( new TimeFrequencySignal<double>( this->getFsIn(), this->getBufferSize_s(), this->fb_nChannels, "inner buffer", _magnitude, _right) );
 												
 				this->prepareForProcessing();
 			}

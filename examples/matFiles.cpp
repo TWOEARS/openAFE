@@ -1,5 +1,23 @@
 #include "matFiles.hpp"
+#include <iostream>
 
+	int writeFs (MATFile *pmat, mxArray *pn, double fsHz) {
+		/* fsHZ */
+		pn = mxCreateDoubleScalar(fsHz);
+		   if (pn == NULL) {
+				printf("Unable to create mxArray with mxCreateDoubleMatrix\n");
+				return(1);
+		}
+		  
+		int status = matPutVariable(pmat, "fsHz", pn);
+		 if ((status) != 0) {
+			  printf("Error writing.\n");
+			  return(EXIT_FAILURE);
+		  }
+		return 0;  	
+		
+	}
+	
 	int matFiles::readMatFile(const char *file, std::vector <std::vector<double> >& earSignals, double *fsHz) {
 	  MATFile *pmat;
 	  const char **dir;
@@ -130,19 +148,8 @@
 		}
 				
 		/* fsHZ */
-		pn2 = mxCreateDoubleScalar(fsHz);
-		   if (pn2 == NULL) {
-				printf("Unable to create mxArray with mxCreateDoubleMatrix\n");
-				return(1);
-		}
-		  
-		status = matPutVariable(pmat, "fsHz", pn2);
-		 if ((status) != 0) {
-			  printf("Error writing.\n");
-			  return(EXIT_FAILURE);
-		  }
-		  
-		  return(0);	  
+		writeFs (pmat, pn2, fsHz);
+		return(0);			  
 	}
 
 	int matFiles::writeTFSMatFile(const char *file, std::vector<std::shared_ptr<openAFE::twoCTypeBlock<double> > >& left, std::vector<std::shared_ptr<openAFE::twoCTypeBlock<double> > >& right, double fsHz) {
@@ -186,7 +193,7 @@
 
 
 		pn_r = mxCreateDoubleMatrix(frameNumber,rightSize,mxREAL);
-		   if (pn_r == NULL) {
+		   if ( pn_r == NULL ) {
 				printf("Unable to create mxArray with mxCreateDoubleMatrix\n");
 				return(1);
 		}
@@ -203,17 +210,61 @@
 		}
 	
 		/* fsHZ */
-		pn2 = mxCreateDoubleScalar(fsHz);
-		   if (pn2 == NULL) {
+		writeFs (pmat, pn2, fsHz);
+		return(0);		
+	}
+
+
+	int matFiles::writeXCORRMatFile(const char *file, std::vector<std::vector<std::shared_ptr<openAFE::twoCTypeBlock<double> > > >& left, std::vector<std::vector<std::shared_ptr<openAFE::twoCTypeBlock<double> > > >& right, double fsHz) {
+		MATFile *pmat;
+
+		/* Variables for mxArrays  */
+		mxArray *pn_l, *pn_r, *pn2;
+		
+		pmat = matOpen(file, "w");
+		if (pmat == NULL) {
+		  printf("Error creating file");
+		return(EXIT_FAILURE);
+		}
+
+		int status;
+
+		/* EAR SIGNAL */
+		std::size_t leftChannels = left.size();
+		std::size_t rightChannels = right.size();
+
+		std::size_t leftLags = left[0].size();
+		std::size_t rightLags = right[0].size();
+				
+		uint32_t frameNumber = left[0][0]->array1.second + left[0][0]->array2.second;
+
+		std::cout << "Channels : " << leftChannels << " Lags : " << leftLags << " frameNumber : " << frameNumber << std::endl;
+		
+		assert ( leftChannels == rightChannels );
+		assert ( leftLags == rightLags );
+		
+
+		std::size_t  ndim = 3, dims[3] = {leftChannels, leftLags, frameNumber};
+
+		pn_l = mxCreateNumericArray(ndim, dims, mxDOUBLE_CLASS, mxREAL );
+		   if (pn_l == NULL) {
 				printf("Unable to create mxArray with mxCreateDoubleMatrix\n");
 				return(1);
 		}
-		  
-		status = matPutVariable(pmat, "fsHz", pn2);
-		 if ((status) != 0) {
-			  printf("Error writing.\n");
-			  return(EXIT_FAILURE);
-		  }
-		  
-		  return(0);		
+		
+		for ( std::size_t ii = 0 ; ii < leftChannels ; ++ii ) {
+			for ( std::size_t jj = 0 ; jj < leftLags ; ++jj ) {	
+				memcpy( mxGetPr(pn_l) + frameNumber * ii + frameNumber * leftChannels * jj , left[ii][jj]->array1.first, left[ii][jj]->array1.second * sizeof(double) );
+				memcpy( mxGetPr(pn_l) + frameNumber * ii + frameNumber * leftChannels * jj + left[ii][jj]->array1.second, left[ii][jj]->array2.first, left[ii][jj]->array2.second * sizeof(double) );
+			}
+		}
+		
+		status = matPutVariable(pmat, "leftOutput", pn_l);
+		if ((status) != 0) {
+			printf("Error writing.\n");
+			return(EXIT_FAILURE);
+		}
+
+		writeFs (pmat, pn2, fsHz);
+		return(0);			
 	}
