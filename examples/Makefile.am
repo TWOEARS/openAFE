@@ -1,4 +1,4 @@
-bin_PROGRAMS = TEST_input TEST_preProc TEST_filterbank TEST_ihc TEST_ild TEST_ratemap TEST_crossCorrelation
+bin_PROGRAMS = TEST_input TEST_preProc TEST_filterbank TEST_ihc TEST_ild TEST_ratemap TEST_crossCorrelation TEST_itd
 
 MATLAB_DIR = '/usr/local/MATLAB/R2015a'
 MATFILESLIB_LIBS = -lmat -lmx
@@ -30,3 +30,6 @@ TEST_ratemap_LDADD = ../src/libopenAFE.la libmatFiles.a $(MATFILESLIB_LIBS)
 
 TEST_crossCorrelation_SOURCES = TEST_crossCorrelation.cpp
 TEST_crossCorrelation_LDADD = ../src/libopenAFE.la libmatFiles.a $(MATFILESLIB_LIBS)
+
+TEST_itd_SOURCES = TEST_itd.cpp
+TEST_itd_LDADD = ../src/libopenAFE.la libmatFiles.a $(MATFILESLIB_LIBS)

@@ -32,7 +32,10 @@ using namespace openAFE;
 					  break;
 					case _crosscorrelation:
 					  this->hasTwoOutputs = false;
-					  break;	  
+					  break;
+					case _itd:
+					  this->hasTwoOutputs = false;
+					  break;					  	  
 					default:
 					  this->hasTwoOutputs = true;
 					  break;

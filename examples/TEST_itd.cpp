@@ -6,6 +6,7 @@
 #include "../src/Processors/gammatoneProc.hpp"
 #include "../src/Processors/ihcProc.hpp"
 #include "../src/Processors/crossCorrelation.hpp"
+#include "../src/Processors/itdProc.hpp"
 
 #include "matFiles.hpp"
 
@@ -17,7 +18,7 @@ int main(int argc, char **argv) {
   double fsHz;
   
   std::string dataPath = "../../examples/Test_signals/AFE_earSignals_16kHz.mat";  
-  std::string outputName = "xcorr_out.mat"; 
+  std::string outputName = "itd_out.mat"; 
   
   std::string errorMessage = "The correct usage is : ";
 	  
@@ -38,7 +39,10 @@ int main(int argc, char **argv) {
 
 	  std::shared_ptr <CrossCorrelation > xcorrP;
 	  xcorrP.reset( new CrossCorrelation("xcorrP", ihcP ) );
-	  	  												  
+
+	  std::shared_ptr <ITD > itdP;
+	  itdP.reset( new ITD("itdP", xcorrP ) );
+	  	  	  												  
 	  inputP->processChunk ( earSignals[0].data(), earSignals[0].size(), earSignals[1].data(), earSignals[1].size() );
 	  inputP->releaseChunk(); 
 		  
@@ -54,16 +58,12 @@ int main(int argc, char **argv) {
 	  xcorrP->processChunk ();
 	  xcorrP->releaseChunk();
 
-	  std::vector<std::vector<std::shared_ptr<twoCTypeBlock<double> > > > lOut = xcorrP->getLeftWholeBufferAccessor();
-
-	  /*
-						for ( std::size_t jjL = 0 ; jjL < this-> ; ++jjL ) {
-							*( lastChunkOfPMZ[jj][jjL]->getPtr(ii) ) = chunk[jjL];
-							std::cout << chunk[jjL] << " ";
-						} std::cout << std::endl;
-						sleep(1);*/
+	  itdP->processChunk ();
+	  itdP->releaseChunk();
+	  
+	  std::vector<std::shared_ptr<twoCTypeBlock<double> > > lOut = itdP->getLeftWholeBufferAccessor();
   
-	  matFiles::writeXCORRMatFile(outputName.c_str(), lOut, fsHz);
+	  matFiles::writeTFSMatFile(outputName.c_str(), lOut, lOut, fsHz);
   } else throw new std::string("Unable to read the inFilePath " + errorMessage);
   																			    
   return 0;  

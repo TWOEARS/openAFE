@@ -30,7 +30,7 @@ namespace openAFE {
 			
 		public:
 		
-			CrossCorrelation (const std::string nameArg, std::shared_ptr<IHCProc > upperProcPtr, double wSizeSec = 0.02, double hSizeSec = 0.01, double decaySec = 0.008, double maxDelaySec = 0.0011, windowType wname = _hann );
+			CrossCorrelation (const std::string nameArg, std::shared_ptr<IHCProc > upperProcPtr, double wSizeSec = 0.02, double hSizeSec = 0.01, double maxDelaySec = 0.0011, windowType wname = _hann );
 
 			~CrossCorrelation ();
 			

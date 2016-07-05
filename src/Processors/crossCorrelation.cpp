@@ -51,15 +51,11 @@ using namespace std;
 				} else {
 					// Else keep lags lower than requested max
 					std::size_t jj = 0;
-					for( std::size_t ii = c.size() - this->maxLag ; ii < c.size() ; ++ii, ++jj ) {
-						std::cout << ii << ", " << jj << std::endl;
+					for( std::size_t ii = c.size() - this->maxLag ; ii < c.size() ; ++ii, ++jj )
 						cFinal[jj] = c[ii];
-					}
-					for( std::size_t ii = 0 ; ii < this->maxLag + 1 ; ++ii, ++jj ) {
-						std::cout << jj << std::endl;						
+					for( std::size_t ii = 0 ; ii < this->maxLag + 1 ; ++ii, ++jj )
 						cFinal[jj] = c[ii];
-					}
-				}				
+				}
 				
 				double powL = sumPow( firstValue_l, this->wSize, 2 );
 				double powR = sumPow( firstValue_r, this->wSize, 2 );
@@ -72,7 +68,7 @@ using namespace std;
 				
 			}
 			
-			CrossCorrelation::CrossCorrelation (const string nameArg, shared_ptr<IHCProc > upperProcPtr, double wSizeSec, double hSizeSec, double decaySec, double maxDelaySec, windowType wname )
+			CrossCorrelation::CrossCorrelation (const string nameArg, shared_ptr<IHCProc > upperProcPtr, double wSizeSec, double hSizeSec, double maxDelaySec, windowType wname )
 			: WindowBasedLAGProcs (nameArg, upperProcPtr, _crosscorrelation, this->getNLags( maxDelaySec, upperProcPtr->getFsOut() ), wSizeSec, hSizeSec, wname ) {
 				this->maxDelaySec = maxDelaySec;
 				
@@ -127,7 +123,6 @@ using namespace std;
 						for ( std::size_t jjL = 0 ; jjL < this->lags.size() ; ++jjL ) {
 							*( lastChunkOfPMZ[jj][jjL]->getPtr(ii) ) = chunk[jjL];
 						}
-						
 					}
 				}
 				

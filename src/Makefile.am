@@ -24,6 +24,7 @@ libopenAFE_la_SOURCES += Processors/ildProc.cpp
 libopenAFE_la_SOURCES += Processors/ratemap.cpp
 libopenAFE_la_SOURCES += Processors/windowBasedLAGProcs.cpp
 libopenAFE_la_SOURCES += Processors/crossCorrelation.cpp
+libopenAFE_la_SOURCES += Processors/itdProc.cpp
 
 libopenAFE_la_LIBADD = tools/libtools.a
 libopenAFE_la_LIBADD += Signals/libsignals.a
@@ -66,3 +67,4 @@ processor_HEADERS += Processors/ratemap.hpp
 processor_HEADERS += Processors/LAGProcessor.hpp
 processor_HEADERS += Processors/windowBasedLAGProcs.hpp
 processor_HEADERS += Processors/crossCorrelation.hpp
+processor_HEADERS += Processors/itdProc.hpp

@@ -113,7 +113,7 @@
 		MATFile *pmat;
 
 		/* Variables for mxArrays  */
-		mxArray *pn_l, *pn2;
+		mxArray *pn_l = NULL, *pn2 = NULL;
 
 		pmat = matOpen(file, "w");
 		if (pmat == NULL) {
@@ -214,12 +214,11 @@
 		return(0);		
 	}
 
-
-	int matFiles::writeXCORRMatFile(const char *file, std::vector<std::vector<std::shared_ptr<openAFE::twoCTypeBlock<double> > > >& left, std::vector<std::vector<std::shared_ptr<openAFE::twoCTypeBlock<double> > > >& right, double fsHz) {
+	int matFiles::writeXCORRMatFile(const char *file, std::vector<std::vector<std::shared_ptr<openAFE::twoCTypeBlock<double> > > >& left, double fsHz) {
 		MATFile *pmat;
 
 		/* Variables for mxArrays  */
-		mxArray *pn_l, *pn_r, *pn2;
+		mxArray *pn_l, *pn2;
 		
 		pmat = matOpen(file, "w");
 		if (pmat == NULL) {
@@ -231,27 +230,19 @@
 
 		/* EAR SIGNAL */
 		std::size_t leftChannels = left.size();
-		std::size_t rightChannels = right.size();
 
 		std::size_t leftLags = left[0].size();
-		std::size_t rightLags = right[0].size();
 				
-		uint32_t frameNumber = left[0][0]->array1.second + left[0][0]->array2.second;
+		uint32_t frameNumber = left[0][0]->array1.second + left[0][0]->array2.second;		
 
-		std::cout << "Channels : " << leftChannels << " Lags : " << leftLags << " frameNumber : " << frameNumber << std::endl;
-		
-		assert ( leftChannels == rightChannels );
-		assert ( leftLags == rightLags );
-		
-
-		std::size_t  ndim = 3, dims[3] = {leftChannels, leftLags, frameNumber};
+		std::size_t  ndim = 3, dims[3] = {frameNumber, leftChannels, leftLags };
 
 		pn_l = mxCreateNumericArray(ndim, dims, mxDOUBLE_CLASS, mxREAL );
 		   if (pn_l == NULL) {
 				printf("Unable to create mxArray with mxCreateDoubleMatrix\n");
 				return(1);
 		}
-		
+	
 		for ( std::size_t ii = 0 ; ii < leftChannels ; ++ii ) {
 			for ( std::size_t jj = 0 ; jj < leftLags ; ++jj ) {	
 				memcpy( mxGetPr(pn_l) + frameNumber * ii + frameNumber * leftChannels * jj , left[ii][jj]->array1.first, left[ii][jj]->array1.second * sizeof(double) );
