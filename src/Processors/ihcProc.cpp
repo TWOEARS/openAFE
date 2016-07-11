@@ -4,32 +4,32 @@ using namespace openAFE;
 
 			void IHCProc::populateFilters( filterPtrVector& filters ) {
 
-				 filters.resize( this->fb_nChannels );
+				 filters.resize( this->get_nChannel() );
 
                  switch ( this->method ) {
 
                      case _joergensen:
                          // First order butterworth filter @ 150Hz
-						 for ( size_t ii = 0 ; ii < fb_nChannels ; ++ii )
+						 for ( size_t ii = 0 ; ii < this->get_nChannel() ; ++ii )
 							filters[ii].reset(new bwFilter( this->getFsIn(), 1, 150, _bwlp ) );
                          break;
 
                      case _dau:
                          // Second order butterworth filter @ 1000Hz
-						 for ( size_t ii = 0 ; ii < fb_nChannels ; ++ii )
+						 for ( size_t ii = 0 ; ii < this->get_nChannel() ; ++ii )
 							filters[ii].reset(new bwFilter( this->getFsIn(), 2, 1000, _bwlp ) );						 
                          break;
 
                      case _breebart:
                          // First order butterworth filter @ 2000Hz cascaded 5 times
-						 for ( size_t ii = 0 ; ii < fb_nChannels ; ++ii ) {
+						 for ( size_t ii = 0 ; ii < this->get_nChannel() ; ++ii ) {
 							 // TODO : implement THIS
 						 }
                          break;
 
                      case _bernstein:
                          // Second order butterworth filter @ 425Hz
-						 for ( size_t ii = 0 ; ii < fb_nChannels ; ++ii ) {
+						 for ( size_t ii = 0 ; ii < this->get_nChannel() ; ++ii ) {
 							filters[ii].reset(new bwFilter( this->getFsIn(), 2, 425, _bwlp ) );
 						 }
                          break;
@@ -140,7 +140,7 @@ using namespace openAFE;
 			
 			void IHCProc::processLR ( filterPtrVector& filters, std::vector<std::shared_ptr<twoCTypeBlock<double> > > PMZ ) {
 				std::vector<std::thread> threads;
-				  for ( size_t ii = 0 ; ii < this->fb_nChannels ; ++ii ) {
+				  for ( size_t ii = 0 ; ii < this->get_nChannel() ; ++ii ) {
 					  if ( ( ( this->method == _joergensen ) or ( this->method == _dau ) or ( this->method == _breebart ) or ( this->method == _bernstein ) ) and ( filters.size() > 0 ) )
 						threads.push_back(std::thread( &IHCProc::processFilteringChannel, this, filters[ii], PMZ[ii] ));
 					  else threads.push_back(std::thread( &IHCProc::processChannel, this, PMZ[ii] ));
@@ -153,7 +153,6 @@ using namespace openAFE;
 																
 			IHCProc::IHCProc (const std::string nameArg, std::shared_ptr<GammatoneProc > upperProcPtr, ihcMethod method ) : TFSProcessor<double > (nameArg, upperProcPtr->getFsOut(), upperProcPtr->getFsOut(), upperProcPtr->getBufferSize_s(), upperProcPtr->get_fb_nChannels(), _magnitude, _ihc) {
 					
-				this->fb_nChannels = upperProcPtr->get_fb_nChannels();
 				this->upperProcPtr = upperProcPtr;
 				this->method = method;
 				this->prepareForProcessing();																							 
@@ -197,8 +196,7 @@ using namespace openAFE;
 
 			// getters
 			const ihcMethod IHCProc::get_ihc_method() {return this->method;}
-			const uint32_t IHCProc::get_ihc_nChannels() {return this->fb_nChannels;}
-
+			
 			// setters
 			void IHCProc::set_ihc_method(const ihcMethod arg) {this->method=arg; this->prepareForProcessing ();}
 

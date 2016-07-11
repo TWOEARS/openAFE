@@ -2,13 +2,14 @@
 
 using namespace openAFE;
 
-			Processor::Processor (const double bufferSize_s, const uint32_t fsIn, const uint32_t fsOut, const std::string& nameArg, procType typeArg) {
+			Processor::Processor (const double bufferSize_s, const uint32_t fsIn, const uint32_t fsOut, const std::size_t nChannel, const std::string& nameArg, procType typeArg) {
 								
 				this->fsIn = fsIn;
 				this->fsOut = fsOut;
 				this->type = typeArg;
 				this->bufferSize_s = bufferSize_s;
-								
+				this->nChannel = nChannel;
+												
 				this->name = nameArg;
 					
 				switch ( typeArg ) {
@@ -79,3 +80,6 @@ using namespace openAFE;
 			const double Processor::getBufferSize_s() {
 				return this->bufferSize_s;
 			}
+
+			std::size_t Processor::get_nChannel() {return this->nChannel;}		
+			

@@ -8,9 +8,10 @@ using namespace std;
 				
 			}
 
-			void processChannel( double* firstValue_l, double* firstValue_r, double* result ) {
+			void ITD::processChannel( vector<shared_ptr<twoCTypeBlock<double> > >& firstValue_l, size_t ii, shared_ptr<twoCTypeBlock<double> > result ) {
 				
-			}
+			}				
+				
 			
 			ITD::ITD ( const std::string nameArg, std::shared_ptr<CrossCorrelation > upperProcPtr )
 			: TFSProcessor<double> ( nameArg, upperProcPtr->getFsOut(), upperProcPtr->getFsOut(), upperProcPtr->getBufferSize_s(), upperProcPtr->get_nChannels(),
@@ -34,9 +35,7 @@ using namespace std;
 				vector<vector<shared_ptr<twoCTypeBlock<double> > > > lastChunk = this->upperProcPtr->getLeftLastChunkAccessor();
 				
 				size_t totalFrames = lastChunk[0][0]->getSize();
-				
-				std::cout << totalFrames << std::endl;				
-								
+												
 				// Creating a chunk of zeros.
 				this->zerosVector.resize( totalFrames, 0 );
 				
@@ -46,17 +45,33 @@ using namespace std;
 				
 				// Appending this chunk to all channels of the PMZ.
 				leftPMZ->appendChunk( zerosAccecor );
-				std::vector<std::shared_ptr<twoCTypeBlock<double> > > lastChunkOfPMZ = leftPMZ->getLastChunkAccesor();
+				vector<shared_ptr<twoCTypeBlock<double> > > lastChunkOfPMZ = leftPMZ->getLastChunkAccesor();
 				
 				// Create a lag vector
 				vector<double> lags(this->upperProcPtr->get_cc_lags_size());
 				for ( size_t ii = 0 ; ii < lags.size() ; ++ii )
 					lags[ii] = ii - floor(((double)lags.size())/2);
-							
-				for ( ii = 0 ; ii < totalFrames ; ++ii ) {
-					for ( std::size_t jj = 0 ; jj < this->fb_nChannels ; ++jj ) {
+				
+				// Loop over the time frame			
+				for ( size_t ii = 0 ; ii < totalFrames ; ++ii ) {
+					// Loop over the frequency channel
+					for ( size_t jj = 0 ; jj < this->get_nChannel() ; ++jj ) {
+
+						// Find the peak in the discretized crosscorrelation						
+						std::size_t index;
+						double max = *( lastChunk[jj][0]->getPtr(ii) );
+						for ( std::size_t jjL = 0 ; jjL < lags.size() ; ++jjL ) {
+							if ( *( lastChunk[jj][jjL]->getPtr(ii) ) < max ) {
+								max = *( lastChunk[jj][jjL]->getPtr(ii) );
+								index = ii;
+							}							
+						}
 						
-						// processChannel( l_innerBuffer[jj]->array1.first + n_start, r_innerBuffer[jj]->array1.first + n_start, lastChunkOfPMZ[jj]->getPtr(ii) );
+						// Lag of most salient peak
+						double lagInt = lags[index];
+						std::cout << "Lag int is " << lagInt << std::endl;
+						sleep(1);
+						
 					}
 				}				
 			}

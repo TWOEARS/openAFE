@@ -15,10 +15,10 @@ namespace openAFE {
 	               			
 			std::shared_ptr <TimeFrequencySignal<T> > leftOutput, rightOutput;
 			std::shared_ptr <TimeFrequencySignal<T> > leftPMZ, rightPMZ;
-			
+						
 		public:
 		
-			TFSProcessor (const std::string nameArg, const uint32_t fsIn, const uint32_t fsOut, const double bufferSize_s, size_t nChannel, scalingType argScaling, procType typeArg) : Processor (bufferSize_s, fsIn, fsOut, nameArg, typeArg) {
+			TFSProcessor (const std::string nameArg, const uint32_t fsIn, const uint32_t fsOut, const double bufferSize_s, size_t nChannel, scalingType argScaling, procType typeArg) : Processor (bufferSize_s, fsIn, fsOut, nChannel, nameArg, typeArg) {
 
 				/* Creating the output signals */
 				if ( this->hasTwoOutputs == true ) {
@@ -34,6 +34,7 @@ namespace openAFE {
 					/* Creating the PMZ signals */
 					leftPMZ.reset( new TimeFrequencySignal<T>(fsOut, bufferSize_s, nChannel, "Mono_PMZ", argScaling, _mono ) );					
 				}
+				
 			}
 			
 			~TFSProcessor() {
@@ -86,7 +87,6 @@ namespace openAFE {
 					this->rightOutput->appendChunk( rightPMZ->getLastChunkAccesor() );
 				} else this->leftOutput->appendChunk( leftPMZ->getLastChunkAccesor() );	
 			}
-
 			
 	};  /* TFSProcessor */
 

@@ -64,7 +64,6 @@ namespace openAFE {
 
 			// getters
 			const ihcMethod get_ihc_method();
-			const uint32_t get_ihc_nChannels();
 
 			// setters			
 			void set_ihc_method(const ihcMethod arg);

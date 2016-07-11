@@ -20,7 +20,7 @@ namespace openAFE {
 			
 		public:
 		
-			LAGProcessor (const std::string nameArg, const uint32_t fsIn, const uint32_t fsOut, const double bufferSize_s, size_t nChannel, size_t nLag, procType typeArg) : Processor (bufferSize_s, fsIn, fsOut, nameArg, typeArg) {
+			LAGProcessor (const std::string nameArg, const uint32_t fsIn, const uint32_t fsOut, const double bufferSize_s, size_t nChannel, size_t nLag, procType typeArg) : Processor (bufferSize_s, fsIn, fsOut, nChannel, nameArg, typeArg) {
 
 				/* Creating the output signals */
 				if ( this->hasTwoOutputs == true ) {

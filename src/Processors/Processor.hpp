@@ -34,6 +34,8 @@ namespace openAFE {
 			uint32_t fsOut;			 			// Sampling frequency of output (i.e., resulting from processing)
 			
 			double bufferSize_s;
+
+			std::size_t nChannel;			
 			
 		public:
 					
@@ -45,7 +47,7 @@ namespace openAFE {
 			  * procName : Name of the processor to implement
 			  * parObj : Parameters instance to use for this processor
 			  */
-			Processor (const double bufferSize_s, const uint32_t fsIn, const uint32_t fsOut, const std::string& nameArg, procType typeArg);
+			Processor (const double bufferSize_s, const uint32_t fsIn, const uint32_t fsOut, const std::size_t nChannel, const std::string& nameArg, procType typeArg);
 			
 			~Processor ();
 			
@@ -75,7 +77,9 @@ namespace openAFE {
 			
 			const double getBufferSize_s();
 
-			virtual std::string get_upperProcName()	= 0;										
+			virtual std::string get_upperProcName()	= 0;
+			
+			std::size_t get_nChannel();					
 	};
 
 };

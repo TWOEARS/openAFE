@@ -23,12 +23,16 @@ mObj.processChunk(earSignals);
 
 openAFE_left = CorrelationSignal(mObj.Processors{4},10,'mono',leftOutput);
 
-% f1l = subplot(2,1,1);
-% dataObj.crosscorrelation{1}.plot(f1l);
-% f1r = subplot(2,1,2);
-% openAFE_left.plot(f1r);
+f1l = subplot(2,1,1);
+dataObj.crosscorrelation{1}.plot(f1l);
+f1r = subplot(2,1,2);
+openAFE_left.plot(f1r);
 
 %% Plottings
+
+% Parameters of crosscorrelation processor
+cc_wSizeSec  = 0.02;
+cc_hSizeSec  = 0.01;
 
 wavPlotZoom = 5; % Zoom factor
 wavPlotDS   = 1; % Down-sampling factor
@@ -44,15 +48,11 @@ wSizeSamples = 0.5 * round((cc_wSizeSec * fsHz * 2));
 wStepSamples = round((cc_hSizeSec * fsHz));
 samplesIdx = (1:wSizeSamples) + ((frameIdx2Plot-1) * wStepSamples);
 
-lagsMS = dObj.crosscorrelation{1}.lags*1E3;
-
-% Plot the waveforms in that frame
-dObj.plot([],[],'bGray',1,'rangeSec',[samplesIdx(1) samplesIdx(end)]/fsHz)
-ylim([-0.35 0.35])
+lagsMS = dataObj.crosscorrelation{1}.lags*1E3;
 
 f1m = subplot(4,1,1);
 % Plot the cross-correlation in that frame
-dObj.crosscorrelation{1}.plot([],p,frameIdx2Plot);
+dataObj.crosscorrelation{1}.plot([],p,frameIdx2Plot);
 f1o = subplot(4,1,2);
 openAFE_left.plot([],p,frameIdx2Plot);
 title('Crosscorrelation computation (openAFE)');

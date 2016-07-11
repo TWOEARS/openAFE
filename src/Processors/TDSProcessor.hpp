@@ -17,7 +17,7 @@ namespace openAFE {
 						
 		public:
 
-		    TDSProcessor (const std::string nameArg, const uint32_t fsIn, const uint32_t fsOut, const double bufferSize_s, procType typeArg) : Processor (bufferSize_s, fsIn, fsOut, nameArg, typeArg) {
+		    TDSProcessor (const std::string nameArg, const uint32_t fsIn, const uint32_t fsOut, const double bufferSize_s, procType typeArg) : Processor (bufferSize_s, fsIn, fsOut, 1, nameArg, typeArg) {
 				
 				/* Creating the output signals */
 				if ( this->hasTwoOutputs == true ) {

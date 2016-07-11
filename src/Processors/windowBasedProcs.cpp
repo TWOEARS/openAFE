@@ -40,9 +40,9 @@ using namespace openAFE;
 			}
 					
 			WindowBasedProcs::WindowBasedProcs (const std::string nameArg, std::shared_ptr<IHCProc > upperProcPtr, procType typeOfThisProc, double wSizeSec, double hSizeSec, windowType wname, scalingType scailingArg  )
-			: TFSProcessor<double > (nameArg, upperProcPtr->getFsOut(), this->calcFsOut( hSizeSec ), upperProcPtr->getBufferSize_s(), upperProcPtr->get_ihc_nChannels(), _magnitude, typeOfThisProc) {
+			: TFSProcessor<double > (nameArg, upperProcPtr->getFsOut(), this->calcFsOut( hSizeSec ), upperProcPtr->getBufferSize_s(), upperProcPtr->get_nChannel(), _magnitude, typeOfThisProc) {
 					
-				this->fb_nChannels = upperProcPtr->get_ihc_nChannels();
+				this->fb_nChannels = upperProcPtr->get_nChannel();
 				
 				this->upperProcPtr = upperProcPtr;
 				this->wSizeSec = wSizeSec;

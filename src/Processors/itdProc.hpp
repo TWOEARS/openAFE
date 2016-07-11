@@ -31,7 +31,7 @@ namespace openAFE {
 
 			void prepareForProcessing();
 
-			void processChannel( double* firstValue_l, double* firstValue_r, double* result );
+			void processChannel( std::vector<std::shared_ptr<twoCTypeBlock<double> > >& firstValue_l, size_t ii, std::shared_ptr<twoCTypeBlock<double> > result );
 			
 			std::shared_ptr<CrossCorrelation > upperProcPtr;
 

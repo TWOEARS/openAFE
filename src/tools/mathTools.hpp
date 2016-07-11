@@ -146,14 +146,6 @@ namespace openAFE {
 		/// CONJ   Complex conjugate.
 		///   CONJ(X) is the complex conjugate of X.
 		///   For a complex X, CONJ(X) = REAL(X) - i*IMAG(X).
-		template <typename T = double>
-		inline
-		std::complex<T> conj( std::complex<T> val ) {
-			std::complex<T> tmp;
-			tmp.real( val.real() );
-			val.imag( -1 * val.imag() );
-		  return tmp;
-		}
 
 		template <typename T = double>
 		inline
@@ -186,12 +178,10 @@ namespace openAFE {
 				for( std::size_t ii = 0 ; ii < valN ; ++ii )
 					fftIn[ii] = *(val+ii);
 			// Truncating		
-			} else if ( fft_N < valN ) {
-				for( std::size_t ii = 0 ; ii < fft_N ; ++ii )
+			} else for( std::size_t ii = 0 ; ii < fft_N ; ++ii )
 					fftIn[ii] = *(val+ii);
-				}
 		
-			std::vector<std::complex<T> > outVect ( fft_N );
+			std::vector<std::complex<T> > outVect ( floor(fft_N/2) + 1 );
 			fftw_complex *out = reinterpret_cast<fftw_complex*>(outVect.data());
 			
 			fftw_plan p = fftw_plan_dft_r2c_1d(fft_N, fftIn.data(), out, FFTW_ESTIMATE);
@@ -201,21 +191,34 @@ namespace openAFE {
 			return outVect;
 		}
 		
-		/// ifft(X) is the inverse discrete Fourier transform of X.		
+		/// ifft(X) is the inverse discrete Fourier transform of X.
 		template <typename T = double>		
-		std::vector<T> ifft( std::complex<T> *val, std::size_t N ) {
+		std::vector<T> ifft( std::complex<T> *val, std::size_t valN, std::size_t fft_N ) {
 		
-			std::vector<T> resultVec ( N );
+			std::vector<T> resultVec ( fft_N );
 			fftw_complex *out = reinterpret_cast<fftw_complex*>( val );
 			
-			fftw_plan ip = fftw_plan_dft_c2r_1d(N, out, resultVec.data(), FFTW_ESTIMATE);
+			fftw_plan ip = fftw_plan_dft_c2r_1d(fft_N, out, resultVec.data(), FFTW_ESTIMATE);
 			
 			fftw_execute(ip);
 			
-			for ( std::size_t ii = 0 ; ii < N ; ++ii )
-				resultVec[ii] /= N;
+			// resultVec.resize( valN );
+			for ( std::size_t ii = 0 ; ii < fft_N ; ++ii )
+				resultVec[ii] /= fft_N;
 
 			return resultVec;
+		}
+
+		///  max    Largest component.
+		template <typename T = double>		
+		T max( T *firstValue, std::size_t dim, std::size_t *index = NULL ) {
+			T max = *firstValue;
+			for ( std::size_t ii = 0 ; ii < dim ; ++ii )
+				if ( *( firstValue + ii ) < max) {
+					max = *( firstValue + ii );
+					*index = ii;
+				}
+			return max;
 		}
 						
 }; /* namespace openAFE */

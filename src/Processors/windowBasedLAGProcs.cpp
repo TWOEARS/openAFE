@@ -40,17 +40,15 @@ using namespace openAFE;
 			}
 			
 			WindowBasedLAGProcs::WindowBasedLAGProcs (const std::string nameArg, std::shared_ptr<IHCProc > upperProcPtr, procType typeOfThisProc, std::size_t nLags, double wSizeSec, double hSizeSec, windowType wname )
-			: LAGProcessor<double > (nameArg, upperProcPtr->getFsOut(), this->calcFsOut( hSizeSec ), upperProcPtr->getBufferSize_s(), upperProcPtr->get_ihc_nChannels(), nLags, typeOfThisProc) {
-					
-				this->fb_nChannels = upperProcPtr->get_ihc_nChannels();
-				
+			: LAGProcessor<double > (nameArg, upperProcPtr->getFsOut(), this->calcFsOut( hSizeSec ), upperProcPtr->getBufferSize_s(), upperProcPtr->get_nChannel(), nLags, typeOfThisProc) {
+									
 				this->upperProcPtr = upperProcPtr;
 				this->wSizeSec = wSizeSec;
 				this->hSizeSec = hSizeSec;
 				this->wname = wname;
 		
-				this->buffer_l.reset( new TimeFrequencySignal<double>( this->getFsIn(), this->getBufferSize_s(), this->fb_nChannels, "inner buffer", _magnitude, _left) );
-				this->buffer_r.reset( new TimeFrequencySignal<double>( this->getFsIn(), this->getBufferSize_s(), this->fb_nChannels, "inner buffer", _magnitude, _right) );
+				this->buffer_l.reset( new TimeFrequencySignal<double>( this->getFsIn(), this->getBufferSize_s(), this->get_nChannel(), "inner buffer", _magnitude, _left) );
+				this->buffer_r.reset( new TimeFrequencySignal<double>( this->getFsIn(), this->getBufferSize_s(), this->get_nChannel(), "inner buffer", _magnitude, _right) );
 												
 				this->prepareForProcessing();
 			}
@@ -77,7 +75,7 @@ using namespace openAFE;
 			const double WindowBasedLAGProcs::get_hSizeSec() {return this->hSizeSec;}
 			const windowType WindowBasedLAGProcs::get_wname() {return this->wname;}
 			
-			const uint32_t WindowBasedLAGProcs::get_nChannels() {return this->fb_nChannels;}
+			const uint32_t WindowBasedLAGProcs::get_nChannels() {return this->get_nChannel();}
 
 			// setters			
 			void WindowBasedLAGProcs::set_wSizeSec(const double arg) {this->wSizeSec=arg; this->prepareForProcessing ();}

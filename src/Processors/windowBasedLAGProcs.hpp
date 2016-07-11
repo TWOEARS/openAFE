@@ -30,7 +30,6 @@ namespace openAFE {
 			std::vector<double> win;         										// Window vector
 			std::shared_ptr <TimeFrequencySignal<double> > buffer_l, buffer_r;    	// Buffered input signals
 
-			uint32_t fb_nChannels;
 			uint32_t nLags;
 			
 			std::shared_ptr<IHCProc > upperProcPtr;
