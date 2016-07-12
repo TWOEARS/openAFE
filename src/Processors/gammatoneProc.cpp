@@ -9,7 +9,7 @@ using namespace openAFE;
 				this->fb_lowFreqHz = fb_lowFreqHz;
 				this->fb_highFreqHz = fb_highFreqHz;
 				this->fb_nERBs = fb_nERBs;
-				this->fb_nChannels = fb_nChannels;		
+				this->nChannel = fb_nChannels;		
 				this->fb_nGamma = fb_nGamma;
 				this->fb_bwERBs = fb_bwERBs;
 
@@ -26,11 +26,11 @@ using namespace openAFE;
              
 					this->fb_lowFreqHz = *( cfHz.begin() );
 					this->fb_highFreqHz = *( cfHz.end() - 1 );
-					this->fb_nChannels = fb_cfHz_length;
+					this->nChannel = fb_cfHz_length;
 					this->fb_nERBs = 0;
 
 				} else 
-					if ( this->fb_nChannels > 0 ) {
+					if ( this->nChannel > 0 ) {
 						/* Medium priority: frequency range and number of channels
 						 *  are provided.
 						 */ 
@@ -38,11 +38,11 @@ using namespace openAFE;
 						// Build a vector of center ERB frequencies
 						std::vector<double> ERBS = linspace( freq2erb(this->fb_lowFreqHz),
 															freq2erb(this->fb_highFreqHz),
-															this->fb_nChannels ); 
+															this->nChannel ); 
 						this->cfHz.resize( ERBS.size() );
 						erb2freq( ERBS.data(), ERBS.size(), cfHz.data() );    // Convert to Hz
 									
-						this->fb_nERBs = ( *(ERBS.end()-1) - *(ERBS.begin()) ) / this->fb_nChannels ;
+						this->fb_nERBs = ( *(ERBS.end()-1) - *(ERBS.begin()) ) / this->nChannel;
 					}
 					else {
 						/* Lowest (default) priority: frequency range and distance 
@@ -57,9 +57,9 @@ using namespace openAFE;
 						this->cfHz.resize( ERBS.size() );
 						erb2freq( ERBS.data(), ERBS.size(), this->cfHz.data() );    // Convert to Hz
 
-						this->fb_nChannels = this->cfHz.size();														
+						this->nChannel = this->cfHz.size();														
 					}
-				return this->fb_nChannels;
+				return this->nChannel;
 			}
 			
 			void GammatoneProc::populateFilters( filterPtrVector& filters ) {
@@ -162,7 +162,7 @@ using namespace openAFE;
 					     ( this->get_fb_lowFreqHz() == toCompare.get_fb_lowFreqHz() ) and
 					     ( this->get_fb_highFreqHz() == toCompare.get_fb_highFreqHz() ) and	
 					     ( this->get_fb_nERBs() == toCompare.get_fb_nERBs() ) and	     
-					     ( this->get_fb_nChannels() == toCompare.get_fb_nChannels() ) and
+					     ( this->get_nChannel() == toCompare.get_nChannel() ) and
 					     ( this->get_fb_nGamma() == toCompare.get_fb_nGamma() ) and	
 					     ( this->get_fb_bwERBs() == toCompare.get_fb_bwERBs() ) )
 						return true;
@@ -174,7 +174,6 @@ using namespace openAFE;
 			const double GammatoneProc::get_fb_lowFreqHz() {return this->fb_lowFreqHz;}
 			const double GammatoneProc::get_fb_highFreqHz() {return this->fb_highFreqHz;}
 			const double GammatoneProc::get_fb_nERBs() {return this->fb_nERBs;}
-			const uint32_t GammatoneProc::get_fb_nChannels() {return this->fb_nChannels;}
 			const uint32_t GammatoneProc::get_fb_nGamma() {return this->fb_nGamma;}
 			const double GammatoneProc::get_fb_bwERBs() {return this->fb_bwERBs;}
 			const double* GammatoneProc::get_fb_cfHz() {return this->cfHz.data();}

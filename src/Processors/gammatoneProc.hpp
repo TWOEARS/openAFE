@@ -34,8 +34,7 @@ namespace openAFE {
 			double fb_bwERBs;        							    				// Bandwidth of the filters in ERBs
 			double fb_lowFreqHz;       							   	 				// Lowest center frequency used at instantiation
 			double fb_highFreqHz;      							    				// Highest center frequency used at instantiation
-			uint32_t fb_nChannels;
-
+			
             typedef std::shared_ptr < GammatoneFilter > gammatoneFilterPtr;
             typedef std::vector <gammatoneFilterPtr > filterPtrVector;
 			filterPtrVector leftFilters, rightFilters;		    				// Array of filter pointer objects
@@ -77,7 +76,6 @@ namespace openAFE {
 			const double get_fb_lowFreqHz();
 			const double get_fb_highFreqHz();
 			const double get_fb_nERBs();
-			const uint32_t get_fb_nChannels();
 			const uint32_t get_fb_nGamma();
 			const double get_fb_bwERBs();
 			const double* get_fb_cfHz();

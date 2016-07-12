@@ -151,7 +151,7 @@ using namespace openAFE;
 					t.join();
 			}
 																
-			IHCProc::IHCProc (const std::string nameArg, std::shared_ptr<GammatoneProc > upperProcPtr, ihcMethod method ) : TFSProcessor<double > (nameArg, upperProcPtr->getFsOut(), upperProcPtr->getFsOut(), upperProcPtr->getBufferSize_s(), upperProcPtr->get_fb_nChannels(), _magnitude, _ihc) {
+			IHCProc::IHCProc (const std::string nameArg, std::shared_ptr<GammatoneProc > upperProcPtr, ihcMethod method ) : TFSProcessor<double > (nameArg, upperProcPtr->getFsOut(), upperProcPtr->getFsOut(), upperProcPtr->getBufferSize_s(), upperProcPtr->get_nChannel(), _magnitude, _ihc) {
 					
 				this->upperProcPtr = upperProcPtr;
 				this->method = method;

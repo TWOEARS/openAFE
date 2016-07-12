@@ -1,12 +1,13 @@
 #include "ratemap.hpp"
 
 using namespace openAFE;
+using namespace std;
 
-			void Ratemap::populateFilters( filterPtrVector& filterVec, std::size_t numberOfChannels, double fs ) {
+			void Ratemap::populateFilters( filterPtrVector& filterVec, size_t numberOfChannels, double fs ) {
 							
 				filterVec.resize(numberOfChannels);
 
-				for ( std::size_t ii = 0 ; ii < numberOfChannels ; ++ii )
+				for ( size_t ii = 0 ; ii < numberOfChannels ; ++ii )
 					filterVec[ii].reset( new leakyIntegratorFilter( fs, this->decaySec ) );
 			}
 			
@@ -41,12 +42,9 @@ using namespace openAFE;
 					default:
 						break;
 				}
-				
-				std::cout << "resultLeft : " << *resultLeft << " resultRight : " << *resultRight << std::endl;
-				sleep(3);
 			}
 			
-			Ratemap::Ratemap (const std::string nameArg, std::shared_ptr<IHCProc > upperProcPtr, double wSizeSec, double hSizeSec, scalingType scailingArg, double decaySec, windowType wname  )
+			Ratemap::Ratemap (const string nameArg, shared_ptr<IHCProc > upperProcPtr, double wSizeSec, double hSizeSec, scalingType scailingArg, double decaySec, windowType wname  )
 			: WindowBasedProcs (nameArg, upperProcPtr, _ratemap, wSizeSec, hSizeSec, wname, scailingArg ) {
 				
 				this->decaySec = decaySec;
@@ -62,19 +60,19 @@ using namespace openAFE;
 			void Ratemap::processChunk () {	
 
 				this->setNFR ( this->upperProcPtr->getNFR() );
-											
+
 				// Append provided input to the buffer
 				this->buffer_l->appendChunk( this->upperProcPtr->getLeftLastChunkAccessor() );
 				this->buffer_r->appendChunk( this->upperProcPtr->getRightLastChunkAccessor() );
 
-				std::vector<std::shared_ptr<twoCTypeBlock<double> > > l_innerBuffer = buffer_l->getLastChunkAccesor();
-				std::vector<std::shared_ptr<twoCTypeBlock<double> > > r_innerBuffer = buffer_r->getLastChunkAccesor();
-				
-				std::size_t dim1_l, dim2_l, dim1_r, dim2_r;
+				vector<shared_ptr<twoCTypeBlock<double> > > l_innerBuffer = buffer_l->getLastChunkAccesor();
+				vector<shared_ptr<twoCTypeBlock<double> > > r_innerBuffer = buffer_r->getLastChunkAccesor();
+
+				size_t dim1_l, dim2_l, dim1_r, dim2_r;
 				double *firstValue1_l, *firstValue2_l, *firstValue1_r, *firstValue2_r;
-				
+
 				// FILTERING
-				for ( std::size_t ii = 0 ; ii < this->get_nChannels() ; ++ii ) {
+				for ( size_t ii = 0 ; ii < this->get_nChannels() ; ++ii ) {
 
 					// LEFT						
 					dim1_l = l_innerBuffer[ii]->array1.second;
@@ -101,18 +99,18 @@ using namespace openAFE;
 						rmFilter_r[ii]->exec ( firstValue2_r, dim2_r, firstValue2_r );											
 					
 				}
-							
+
 				// The buffer should be linearized for windowing.
 				this->buffer_l->linearizeBuffer();
 				this->buffer_r->linearizeBuffer();
-								
+												
 				l_innerBuffer = buffer_l->getWholeBufferAccesor();
 				r_innerBuffer = buffer_r->getWholeBufferAccesor();
 				
 				// Quick control of dimensionality
 				assert( l_innerBuffer.size() == r_innerBuffer.size() );
 
-				std::size_t totalFrames = floor( ( this->buffer_l->getSize() - ( this->wSize - this->hSize ) ) / this->hSize );
+				size_t totalFrames = floor( ( this->buffer_l->getSize() - ( this->wSize - this->hSize ) ) / this->hSize );
 								
 				// Creating a chunk of zeros.
 				this->zerosVector.resize( totalFrames, 0 );
@@ -124,17 +122,17 @@ using namespace openAFE;
 				// Appending this chunk to all channels of the PMZ.
 				leftPMZ->appendChunk( zerosAccecor );
 				rightPMZ->appendChunk( zerosAccecor );
-				std::vector<std::shared_ptr<twoCTypeBlock<double> > > lastChunkOfPMZ = leftPMZ->getLastChunkAccesor();
-				std::vector<std::shared_ptr<twoCTypeBlock<double> > > rightChunkOfPMZ = rightPMZ->getLastChunkAccesor();
+				vector<shared_ptr<twoCTypeBlock<double> > > lastChunkOfPMZ = leftPMZ->getLastChunkAccesor();
+				vector<shared_ptr<twoCTypeBlock<double> > > rightChunkOfPMZ = rightPMZ->getLastChunkAccesor();
 
-				std::size_t ii;
+				size_t ii;
 				uint32_t n_start;
-				for ( ii = 1 /* TODO : 0 */ ; ii < totalFrames ; ++ii ) {
+				for ( ii = 0 ; ii < totalFrames ; ++ii ) {
 
 					n_start = ii * this->hSize;
 
 					// Loop on the channels : Got better run-time results when not creating threads.
-					for ( std::size_t jj = 0 ; jj < this->fb_nChannels ; ++jj )
+					for ( size_t jj = 0 ; jj < this->fb_nChannels ; ++jj )
 						processChannel( l_innerBuffer[jj]->array1.first + n_start, r_innerBuffer[jj]->array1.first + n_start, lastChunkOfPMZ[jj]->getPtr(ii), rightChunkOfPMZ[jj]->getPtr(ii) );
 				}
 

@@ -31,7 +31,7 @@ namespace openAFE {
 			}
 			
 			T *getPtr( std::size_t index ) {
-				if ( array1.second >= index )
+				if ( array1.second > index )
 					return array1.first + index;
 				else return array2.first + index - array1.second;
 			}			
