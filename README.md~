@@ -27,7 +27,7 @@ change the
 ```Makefile
 SUBDIRS = src examples
 ```
-to
+
 ```Makefile
 SUBDIRS = src
 ```
@@ -38,7 +38,9 @@ change the
 ```Makefile
 AC_CONFIG_FILES([Makefile src/Makefile src/tools/Makefile src/Signals/Makefile src/Filters/Makefile src/Processors/Makefile examples/Makefile])
 '''
+
 to
+
 ```Makefile
 AC_CONFIG_FILES([Makefile src/Makefile src/tools/Makefile src/Signals/Makefile src/Filters/Makefile src/Processors/Makefile])
 ```
