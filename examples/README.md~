@@ -2,10 +2,10 @@ openAFE DEMO Examples
 ===========================
 
 ## Input
-Once the installation is finished, you can run the demo examples. You should provide a .mat file containing an array called earSignals (matrix of m x 2) corresponding to the binaural input signal and a value called fsHz which is the sampling frequency.
+Once the installation is finished, you can run the demo examples. You should provide a .mat file containing an array called earSignals (matrix of m x 2) corresponding to the binaural input signal and a value called fsHZ which is the sampling frequency.
 
 ## Output
-The output is a .mat file as well. This file contains the output datas in two separate matrices (left - right), and a value called fsHz which is the sampling frequency.
+The output is a .mat file as well. This file contains the output datas in two separate matrices (left - right), and a value called fsHZ which is the sampling frequency.
 
 ## Usage
 For each demo, you should provide at least following informations : 
