@@ -3,8 +3,9 @@ clear all; close all; clc;
 addpath(genpath('/home/musabini/matlab_ws'));
 startTwoEars;
 
-load ../../AFE_earSignals_16kHz.mat
-load gammatone_out.mat
+load AFE_earSignals_16kHz.mat
+%load gammatone_out.mat
+load /home/musabini/externalLibs/exampleAutconf/openAFE/build/examples/gtt.mat
 
 requests = 'filterbank';
 

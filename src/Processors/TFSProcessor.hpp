@@ -78,13 +78,11 @@ namespace openAFE {
 			
 			void releaseChunk () {
 				if ( this->hasTwoOutputs ) {						
-					//std::thread leftAppendThread( &TimeFrequencySignal<T>::appendChunk, this->leftOutput, leftPMZ->getLastChunkAccesor() );
-					//std::thread rightAppendThread( &TimeFrequencySignal<T>::appendChunk, this->rightOutput, rightPMZ->getLastChunkAccesor() );
+					std::thread leftAppendThread( &TimeFrequencySignal<T>::appendChunk, this->leftOutput, this->leftPMZ->getLastChunkAccesor() );
+					std::thread rightAppendThread( &TimeFrequencySignal<T>::appendChunk, this->rightOutput, this->rightPMZ->getLastChunkAccesor() );
 						
-					//leftAppendThread.join();                // pauses until left finishes
-					//rightAppendThread.join();               // pauses until right finishes
-					this->leftOutput->appendChunk( leftPMZ->getLastChunkAccesor() );
-					this->rightOutput->appendChunk( rightPMZ->getLastChunkAccesor() );
+					leftAppendThread.join();                // pauses until left finishes
+					rightAppendThread.join();               // pauses until right finishes
 				} else this->leftOutput->appendChunk( leftPMZ->getLastChunkAccesor() );	
 			}
 			

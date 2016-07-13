@@ -44,14 +44,14 @@ using namespace std;
 				size_t totalFrames = floor( ( this->buffer_l->getSize() - ( this->wSize - this->hSize ) ) / this->hSize );
 												
 				// Creating a chunk of zeros.
-				this->zerosVector.resize( totalFrames, 600 );
+				this->zerosVector.resize( totalFrames, 0 );
 				
 				// Creating a accesor to it (The data on zerosVector is continious)
 				this->zerosAccecor->array1.first = zerosVector.data(); this->zerosAccecor->array2.first = nullptr;
 				this->zerosAccecor->array1.second = zerosVector.size(); this->zerosAccecor->array2.second = 0;
 
 				// Appending this chunk to all channels of the PMZ.
-				leftPMZ->appendChunk( zerosAccecor );
+				leftPMZ->appendNChunk( zerosAccecor );
 				vector<shared_ptr<twoCTypeBlock<double> > > lastChunkOfPMZ = leftPMZ->getLastChunkAccesor();
 										
 				size_t ii;
@@ -64,7 +64,6 @@ using namespace std;
 					for ( size_t jj = 0 ; jj < this->fb_nChannels ; ++jj )
 						processChannel( l_innerBuffer[jj]->getPtr(n_start), r_innerBuffer[jj]->getPtr(n_start), lastChunkOfPMZ[jj]->getPtr(ii) );
 				}
-				
 				this->buffer_l->pop_chunk( ii * this->hSize );
 				this->buffer_r->pop_chunk( ii * this->hSize );
 			}

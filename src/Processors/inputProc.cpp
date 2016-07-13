@@ -8,8 +8,10 @@ using namespace openAFE;
 			}
 
 			InputProc::InputProc ( const std::string nameArg, const uint32_t fs, const double bufferSize_s, bool in_doNormalize, uint64_t in_normalizeValue ) : TDSProcessor<double> (nameArg, fs, fs, bufferSize_s, _inputProc) {
-				this->in_doNormalize = in_doNormalize;
-				this->in_normalizeValue = in_normalizeValue;
+				if ( in_normalizeValue != 0 ) {
+					this->in_doNormalize = in_doNormalize;
+					this->in_normalizeValue = in_normalizeValue;
+				}
 			}
 				
 			InputProc::~InputProc () {	}

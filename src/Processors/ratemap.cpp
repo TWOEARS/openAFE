@@ -120,8 +120,8 @@ using namespace std;
 				this->zerosAccecor->array1.second = zerosVector.size(); this->zerosAccecor->array2.second = 0;
 
 				// Appending this chunk to all channels of the PMZ.
-				leftPMZ->appendChunk( zerosAccecor );
-				rightPMZ->appendChunk( zerosAccecor );
+				leftPMZ->appendNChunk( zerosAccecor );
+				rightPMZ->appendNChunk( zerosAccecor );
 				vector<shared_ptr<twoCTypeBlock<double> > > lastChunkOfPMZ = leftPMZ->getLastChunkAccesor();
 				vector<shared_ptr<twoCTypeBlock<double> > > rightChunkOfPMZ = rightPMZ->getLastChunkAccesor();
 

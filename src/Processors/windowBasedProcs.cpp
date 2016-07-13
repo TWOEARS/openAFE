@@ -1,6 +1,7 @@
 #include "windowBasedProcs.hpp"
 
 using namespace openAFE;
+using namespace std;
 
 			uint32_t WindowBasedProcs::calcFsOut( double ild_hSizeSec ) {
 				return 1 / ild_hSizeSec;
@@ -39,7 +40,7 @@ using namespace openAFE;
 				this->zerosAccecor.reset( new twoCTypeBlock<double>() );
 			}
 					
-			WindowBasedProcs::WindowBasedProcs (const std::string nameArg, std::shared_ptr<IHCProc > upperProcPtr, procType typeOfThisProc, double wSizeSec, double hSizeSec, windowType wname, scalingType scailingArg  )
+			WindowBasedProcs::WindowBasedProcs (const string nameArg, shared_ptr<IHCProc > upperProcPtr, procType typeOfThisProc, double wSizeSec, double hSizeSec, windowType wname, scalingType scailingArg  )
 			: TFSProcessor<double > (nameArg, upperProcPtr->getFsOut(), this->calcFsOut( hSizeSec ), upperProcPtr->getBufferSize_s(), upperProcPtr->get_nChannel(), _magnitude, typeOfThisProc) {
 					
 				this->fb_nChannels = upperProcPtr->get_nChannel();
@@ -48,7 +49,7 @@ using namespace openAFE;
 				this->wSizeSec = wSizeSec;
 				this->hSizeSec = hSizeSec;
 				this->wname = wname;
-
+				
 				this->buffer_l.reset( new TimeFrequencySignal<double>( this->getFsIn(), this->getBufferSize_s(), this->fb_nChannels, "inner buffer", scailingArg, _left) );
 				this->buffer_r.reset( new TimeFrequencySignal<double>( this->getFsIn(), this->getBufferSize_s(), this->fb_nChannels, "inner buffer", scailingArg, _right) );
 												
@@ -84,4 +85,4 @@ using namespace openAFE;
 			void WindowBasedProcs::set_hSizeSec(const double arg) {this->hSizeSec=arg; this->prepareForProcessing ();}
 			void WindowBasedProcs::set_wname(const windowType arg) {this->wname=arg; this->prepareForProcessing ();}
 
-			std::string WindowBasedProcs::get_upperProcName() {return this->upperProcPtr->getName();}
+			string WindowBasedProcs::get_upperProcName() {return this->upperProcPtr->getName();}

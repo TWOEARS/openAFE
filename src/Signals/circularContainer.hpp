@@ -140,7 +140,10 @@ namespace openAFE {
 		}
 
 		void pop_chunk( std::size_t dim ) {
-			for (unsigned int i = 0 ; i < dim ; ++i )
+			std::size_t tmp = dim;
+			if ( dim > buffer.size() )
+				tmp = buffer.size();
+			for (unsigned int i = 0 ; i < tmp ; ++i )
 				this->pop_front();
 		}
 		

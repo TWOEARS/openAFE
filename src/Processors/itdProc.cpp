@@ -44,7 +44,7 @@ using namespace std;
 				this->zerosAccecor->array1.second = zerosVector.size(); this->zerosAccecor->array2.second = 0;
 				
 				// Appending this chunk to all channels of the PMZ.
-				leftPMZ->appendChunk( zerosAccecor );
+				leftPMZ->appendNChunk( zerosAccecor );
 				vector<shared_ptr<twoCTypeBlock<double> > > lastChunkOfPMZ = leftPMZ->getLastChunkAccesor();
 				
 				// Create a lag vector

@@ -70,7 +70,7 @@ namespace openAFE {
 			this->oldDataInfo.clear();
 		}
 		
-		void appendChunk( std::shared_ptr<twoCTypeBlock<T> > inChunk ) {
+		void appendNChunk( std::shared_ptr<twoCTypeBlock<T> > inChunk ) {
 			for ( std::size_t ii = 0 ; ii < this->nChannel ; ++ii )
 				buffer[ii]->push_chunk( inChunk );
 		}

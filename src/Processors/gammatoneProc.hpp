@@ -17,7 +17,7 @@
  
 namespace openAFE {
 	
-	enum filterBankType{
+	enum filterBankType {
 		_gammatoneFilterBank,
 		_drnlFilterBank
 	};

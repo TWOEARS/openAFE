@@ -136,8 +136,8 @@ using namespace openAFE;
 				this->setNFR ( this->upperProcPtr->getNFR() );
 				
 				// Appending the chunk to process (the processing must be done on the PMZ)
-				leftPMZ->appendChunk( this->upperProcPtr->getLeftLastChunkAccessor() );
-				rightPMZ->appendChunk( this->upperProcPtr->getRightLastChunkAccessor() );
+				leftPMZ->appendNChunk( this->upperProcPtr->getLeftLastChunkAccessor() );
+				rightPMZ->appendNChunk( this->upperProcPtr->getRightLastChunkAccessor() );
 				
 				std::vector<std::shared_ptr<twoCTypeBlock<double> > > l_PMZ = leftPMZ->getLastChunkAccesor();
 				std::vector<std::shared_ptr<twoCTypeBlock<double> > > r_PMZ = rightPMZ->getLastChunkAccesor();

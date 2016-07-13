@@ -7,7 +7,6 @@
 
 
 namespace openAFE {
-	// Alias definitions
 			
 	/* twoCTypeBlock : This is needed to save the
 	 * first and the second parts of the last chunk from a 
