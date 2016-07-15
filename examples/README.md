@@ -1,4 +1,4 @@
-openAFE DEMO Examples
+openAFE Examples
 ===========================
 
 ## Input
@@ -18,7 +18,7 @@ The other arguments are optional. If missing, the default values will be used. I
 ## Input Processor
 
 ```Shell
->> ./TEST_input inFilePath outputName bufferSize_s doNormalize normalizeValue
+>> ./DEMO_input inFilePath outputName bufferSize_s doNormalize normalizeValue
 ```
 
 * 'bufferSize_s' : The buffer size in seconds
@@ -27,7 +27,7 @@ The other arguments are optional. If missing, the default values will be used. I
 
 ## Pre-Processor
 ```Shell
->> ./TEST_preProc inFilePath outputName bRemoveDC cutoffHzDC bPreEmphasis coefPreEmphasis bNormalizeRMS intTimeSecRMS bLevelScaling refSPLdB bMiddleEarFiltering middleEarModel bUnityComp
+>> ./DEMO_preProc inFilePath outputName bRemoveDC cutoffHzDC bPreEmphasis coefPreEmphasis bNormalizeRMS intTimeSecRMS bLevelScaling refSPLdB bMiddleEarFiltering middleEarModel bUnityComp
 ```
 
 * 'bRemoveDC_s' : Flag to activate DC removal filter ( 0 or 1 )
@@ -45,7 +45,7 @@ The other arguments are optional. If missing, the default values will be used. I
 
 ## Gammatone Filterbank
 ```Shell
->> ./TEST_filterbank inFilePath outputName fb_lowFreqHz fb_highFreqHz fb_nERBs fb_nChannels fb_nGamma fb_bwERBs
+>> ./DEMO_filterbank inFilePath outputName fb_lowFreqHz fb_highFreqHz fb_nERBs fb_nChannels fb_nGamma fb_bwERBs
 ```
 
 * 'fb_lowFreqHz' : Lowest center frequency
@@ -57,14 +57,14 @@ The other arguments are optional. If missing, the default values will be used. I
 
 ## Inner Hair Cell
 ```Shell
->> ./TEST_ihc inFilePath outputName method
+>> ./DEMO_ihc inFilePath outputName method
 ```
 
 * 'method' : The IHC method name (none, halfwave, fullwave, square, dau)
 
 ## Interaural Level Difference processor
 ```Shell
->> ./TEST_ild inFilePath outputName wSizeSec hSizeSec windowType
+>> ./DEMO_ild inFilePath outputName wSizeSec hSizeSec windowType
 ```
 
 * 'wSizeSec' : Window duration in seconds
@@ -73,7 +73,7 @@ The other arguments are optional. If missing, the default values will be used. I
 
 ## Ratemap
 ```Shell
->> ./TEST_ratemap inFilePath outputName wSizeSec hSizeSec scailingArg decaySec wname
+>> ./DEMO_ratemap inFilePath outputName wSizeSec hSizeSec scailingArg decaySec wname
 ```
 
 * 'wSizeSec' : Window duration in seconds
@@ -84,7 +84,7 @@ The other arguments are optional. If missing, the default values will be used. I
 
 ## Cross correlation
 ```Shell
->> ./TEST_crossCorrelation inFilePath outputName wSizeSec hSizeSec maxDelaySec wname
+>> ./DEMO_crossCorrelation inFilePath outputName wSizeSec hSizeSec maxDelaySec wname
 ```
 
 * 'wSizeSec' : Window duration in seconds

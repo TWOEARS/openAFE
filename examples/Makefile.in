@@ -79,10 +79,10 @@ PRE_UNINSTALL = :
 POST_UNINSTALL = :
 build_triplet = @build@
 host_triplet = @host@
-bin_PROGRAMS = TEST_input$(EXEEXT) TEST_preProc$(EXEEXT) \
-	TEST_filterbank$(EXEEXT) TEST_ihc$(EXEEXT) TEST_ild$(EXEEXT) \
-	TEST_ratemap$(EXEEXT) TEST_crossCorrelation$(EXEEXT) \
-	TEST_itd$(EXEEXT)
+bin_PROGRAMS = DEMO_input$(EXEEXT) DEMO_preProc$(EXEEXT) \
+	DEMO_filterbank$(EXEEXT) DEMO_ihc$(EXEEXT) DEMO_ild$(EXEEXT) \
+	DEMO_ratemap$(EXEEXT) DEMO_crossCorrelation$(EXEEXT) \
+	DEMO_itd$(EXEEXT)
 subdir = examples
 DIST_COMMON = $(srcdir)/Makefile.in $(srcdir)/Makefile.am \
 	$(top_srcdir)/depcomp
@@ -108,42 +108,42 @@ am_libmatFiles_a_OBJECTS = matFiles.$(OBJEXT)
 libmatFiles_a_OBJECTS = $(am_libmatFiles_a_OBJECTS)
 am__installdirs = "$(DESTDIR)$(bindir)"
 PROGRAMS = $(bin_PROGRAMS)
-am_TEST_crossCorrelation_OBJECTS = TEST_crossCorrelation.$(OBJEXT)
-TEST_crossCorrelation_OBJECTS = $(am_TEST_crossCorrelation_OBJECTS)
+am_DEMO_crossCorrelation_OBJECTS = DEMO_crossCorrelation.$(OBJEXT)
+DEMO_crossCorrelation_OBJECTS = $(am_DEMO_crossCorrelation_OBJECTS)
 am__DEPENDENCIES_1 =
-TEST_crossCorrelation_DEPENDENCIES = ../src/libopenAFE.la \
+DEMO_crossCorrelation_DEPENDENCIES = ../src/libopenAFE.la \
 	libmatFiles.a $(am__DEPENDENCIES_1)
 AM_V_lt = $(am__v_lt_@AM_V@)
 am__v_lt_ = $(am__v_lt_@AM_DEFAULT_V@)
 am__v_lt_0 = --silent
 am__v_lt_1 = 
-am_TEST_filterbank_OBJECTS = TEST_filterbank.$(OBJEXT)
-TEST_filterbank_OBJECTS = $(am_TEST_filterbank_OBJECTS)
-TEST_filterbank_DEPENDENCIES = ../src/libopenAFE.la libmatFiles.a \
+am_DEMO_filterbank_OBJECTS = DEMO_filterbank.$(OBJEXT)
+DEMO_filterbank_OBJECTS = $(am_DEMO_filterbank_OBJECTS)
+DEMO_filterbank_DEPENDENCIES = ../src/libopenAFE.la libmatFiles.a \
 	$(am__DEPENDENCIES_1)
-am_TEST_ihc_OBJECTS = TEST_ihc.$(OBJEXT)
-TEST_ihc_OBJECTS = $(am_TEST_ihc_OBJECTS)
-TEST_ihc_DEPENDENCIES = ../src/libopenAFE.la libmatFiles.a \
+am_DEMO_ihc_OBJECTS = DEMO_ihc.$(OBJEXT)
+DEMO_ihc_OBJECTS = $(am_DEMO_ihc_OBJECTS)
+DEMO_ihc_DEPENDENCIES = ../src/libopenAFE.la libmatFiles.a \
 	$(am__DEPENDENCIES_1)
-am_TEST_ild_OBJECTS = TEST_ild.$(OBJEXT)
-TEST_ild_OBJECTS = $(am_TEST_ild_OBJECTS)
-TEST_ild_DEPENDENCIES = ../src/libopenAFE.la libmatFiles.a \
+am_DEMO_ild_OBJECTS = DEMO_ild.$(OBJEXT)
+DEMO_ild_OBJECTS = $(am_DEMO_ild_OBJECTS)
+DEMO_ild_DEPENDENCIES = ../src/libopenAFE.la libmatFiles.a \
 	$(am__DEPENDENCIES_1)
-am_TEST_input_OBJECTS = TEST_input.$(OBJEXT)
-TEST_input_OBJECTS = $(am_TEST_input_OBJECTS)
-TEST_input_DEPENDENCIES = ../src/libopenAFE.la libmatFiles.a \
+am_DEMO_input_OBJECTS = DEMO_input.$(OBJEXT)
+DEMO_input_OBJECTS = $(am_DEMO_input_OBJECTS)
+DEMO_input_DEPENDENCIES = ../src/libopenAFE.la libmatFiles.a \
 	$(am__DEPENDENCIES_1)
-am_TEST_itd_OBJECTS = TEST_itd.$(OBJEXT)
-TEST_itd_OBJECTS = $(am_TEST_itd_OBJECTS)
-TEST_itd_DEPENDENCIES = ../src/libopenAFE.la libmatFiles.a \
+am_DEMO_itd_OBJECTS = DEMO_itd.$(OBJEXT)
+DEMO_itd_OBJECTS = $(am_DEMO_itd_OBJECTS)
+DEMO_itd_DEPENDENCIES = ../src/libopenAFE.la libmatFiles.a \
 	$(am__DEPENDENCIES_1)
-am_TEST_preProc_OBJECTS = TEST_preProc.$(OBJEXT)
-TEST_preProc_OBJECTS = $(am_TEST_preProc_OBJECTS)
-TEST_preProc_DEPENDENCIES = ../src/libopenAFE.la libmatFiles.a \
+am_DEMO_preProc_OBJECTS = DEMO_preProc.$(OBJEXT)
+DEMO_preProc_OBJECTS = $(am_DEMO_preProc_OBJECTS)
+DEMO_preProc_DEPENDENCIES = ../src/libopenAFE.la libmatFiles.a \
 	$(am__DEPENDENCIES_1)
-am_TEST_ratemap_OBJECTS = TEST_ratemap.$(OBJEXT)
-TEST_ratemap_OBJECTS = $(am_TEST_ratemap_OBJECTS)
-TEST_ratemap_DEPENDENCIES = ../src/libopenAFE.la libmatFiles.a \
+am_DEMO_ratemap_OBJECTS = DEMO_ratemap.$(OBJEXT)
+DEMO_ratemap_OBJECTS = $(am_DEMO_ratemap_OBJECTS)
+DEMO_ratemap_DEPENDENCIES = ../src/libopenAFE.la libmatFiles.a \
 	$(am__DEPENDENCIES_1)
 AM_V_P = $(am__v_P_@AM_V@)
 am__v_P_ = $(am__v_P_@AM_DEFAULT_V@)
@@ -197,15 +197,15 @@ AM_V_CCLD = $(am__v_CCLD_@AM_V@)
 am__v_CCLD_ = $(am__v_CCLD_@AM_DEFAULT_V@)
 am__v_CCLD_0 = @echo "  CCLD    " $@;
 am__v_CCLD_1 = 
-SOURCES = $(libmatFiles_a_SOURCES) $(TEST_crossCorrelation_SOURCES) \
-	$(TEST_filterbank_SOURCES) $(TEST_ihc_SOURCES) \
-	$(TEST_ild_SOURCES) $(TEST_input_SOURCES) $(TEST_itd_SOURCES) \
-	$(TEST_preProc_SOURCES) $(TEST_ratemap_SOURCES)
+SOURCES = $(libmatFiles_a_SOURCES) $(DEMO_crossCorrelation_SOURCES) \
+	$(DEMO_filterbank_SOURCES) $(DEMO_ihc_SOURCES) \
+	$(DEMO_ild_SOURCES) $(DEMO_input_SOURCES) $(DEMO_itd_SOURCES) \
+	$(DEMO_preProc_SOURCES) $(DEMO_ratemap_SOURCES)
 DIST_SOURCES = $(libmatFiles_a_SOURCES) \
-	$(TEST_crossCorrelation_SOURCES) $(TEST_filterbank_SOURCES) \
-	$(TEST_ihc_SOURCES) $(TEST_ild_SOURCES) $(TEST_input_SOURCES) \
-	$(TEST_itd_SOURCES) $(TEST_preProc_SOURCES) \
-	$(TEST_ratemap_SOURCES)
+	$(DEMO_crossCorrelation_SOURCES) $(DEMO_filterbank_SOURCES) \
+	$(DEMO_ihc_SOURCES) $(DEMO_ild_SOURCES) $(DEMO_input_SOURCES) \
+	$(DEMO_itd_SOURCES) $(DEMO_preProc_SOURCES) \
+	$(DEMO_ratemap_SOURCES)
 am__can_run_installinfo = \
   case $$AM_UPDATE_INFO_DIR in \
     n|no|NO) false;; \
@@ -350,29 +350,26 @@ target_alias = @target_alias@
 top_build_prefix = @top_build_prefix@
 top_builddir = @top_builddir@
 top_srcdir = @top_srcdir@
-MATLAB_DIR = '/usr/local/MATLAB/R2015a'
 MATFILESLIB_LIBS = -lmat -lmx
-AM_CXXFLAGS = $(CPPFLAGS) -I$(MATLAB_DIR)/extern/include \
-	-L$(MATLAB_DIR)/bin/glnxa64 \
-	-Wl,-rpath=$(MATLAB_DIR)/bin/glnxa64
+AM_CXXFLAGS = $(CPPFLAGS) $(CXXFLAGS)
 noinst_LIBRARIES = libmatFiles.a
 libmatFiles_a_SOURCES = matFiles.hpp matFiles.cpp
-TEST_input_SOURCES = TEST_input.cpp
-TEST_input_LDADD = ../src/libopenAFE.la libmatFiles.a $(MATFILESLIB_LIBS)
-TEST_preProc_SOURCES = TEST_preProc.cpp
-TEST_preProc_LDADD = ../src/libopenAFE.la libmatFiles.a $(MATFILESLIB_LIBS)
-TEST_filterbank_SOURCES = TEST_filterbank.cpp
-TEST_filterbank_LDADD = ../src/libopenAFE.la libmatFiles.a $(MATFILESLIB_LIBS)
-TEST_ihc_SOURCES = TEST_ihc.cpp
-TEST_ihc_LDADD = ../src/libopenAFE.la libmatFiles.a $(MATFILESLIB_LIBS)
-TEST_ild_SOURCES = TEST_ild.cpp
-TEST_ild_LDADD = ../src/libopenAFE.la libmatFiles.a $(MATFILESLIB_LIBS)
-TEST_ratemap_SOURCES = TEST_ratemap.cpp
-TEST_ratemap_LDADD = ../src/libopenAFE.la libmatFiles.a $(MATFILESLIB_LIBS)
-TEST_crossCorrelation_SOURCES = TEST_crossCorrelation.cpp
-TEST_crossCorrelation_LDADD = ../src/libopenAFE.la libmatFiles.a $(MATFILESLIB_LIBS)
-TEST_itd_SOURCES = TEST_itd.cpp
-TEST_itd_LDADD = ../src/libopenAFE.la libmatFiles.a $(MATFILESLIB_LIBS)
+DEMO_input_SOURCES = DEMO_input.cpp
+DEMO_input_LDADD = ../src/libopenAFE.la libmatFiles.a $(MATFILESLIB_LIBS)
+DEMO_preProc_SOURCES = DEMO_preProc.cpp
+DEMO_preProc_LDADD = ../src/libopenAFE.la libmatFiles.a $(MATFILESLIB_LIBS)
+DEMO_filterbank_SOURCES = DEMO_filterbank.cpp
+DEMO_filterbank_LDADD = ../src/libopenAFE.la libmatFiles.a $(MATFILESLIB_LIBS)
+DEMO_ihc_SOURCES = DEMO_ihc.cpp
+DEMO_ihc_LDADD = ../src/libopenAFE.la libmatFiles.a $(MATFILESLIB_LIBS)
+DEMO_ild_SOURCES = DEMO_ild.cpp
+DEMO_ild_LDADD = ../src/libopenAFE.la libmatFiles.a $(MATFILESLIB_LIBS)
+DEMO_ratemap_SOURCES = DEMO_ratemap.cpp
+DEMO_ratemap_LDADD = ../src/libopenAFE.la libmatFiles.a $(MATFILESLIB_LIBS)
+DEMO_crossCorrelation_SOURCES = DEMO_crossCorrelation.cpp
+DEMO_crossCorrelation_LDADD = ../src/libopenAFE.la libmatFiles.a $(MATFILESLIB_LIBS)
+DEMO_itd_SOURCES = DEMO_itd.cpp
+DEMO_itd_LDADD = ../src/libopenAFE.la libmatFiles.a $(MATFILESLIB_LIBS)
 all: all-am
 
 .SUFFIXES:
@@ -465,37 +462,37 @@ clean-binPROGRAMS:
 	echo " rm -f" $$list; \
 	rm -f $$list
 
-TEST_crossCorrelation$(EXEEXT): $(TEST_crossCorrelation_OBJECTS) $(TEST_crossCorrelation_DEPENDENCIES) $(EXTRA_TEST_crossCorrelation_DEPENDENCIES) 
-	@rm -f TEST_crossCorrelation$(EXEEXT)
-	$(AM_V_CXXLD)$(CXXLINK) $(TEST_crossCorrelation_OBJECTS) $(TEST_crossCorrelation_LDADD) $(LIBS)
+DEMO_crossCorrelation$(EXEEXT): $(DEMO_crossCorrelation_OBJECTS) $(DEMO_crossCorrelation_DEPENDENCIES) $(EXTRA_DEMO_crossCorrelation_DEPENDENCIES) 
+	@rm -f DEMO_crossCorrelation$(EXEEXT)
+	$(AM_V_CXXLD)$(CXXLINK) $(DEMO_crossCorrelation_OBJECTS) $(DEMO_crossCorrelation_LDADD) $(LIBS)
 
-TEST_filterbank$(EXEEXT): $(TEST_filterbank_OBJECTS) $(TEST_filterbank_DEPENDENCIES) $(EXTRA_TEST_filterbank_DEPENDENCIES) 
-	@rm -f TEST_filterbank$(EXEEXT)
-	$(AM_V_CXXLD)$(CXXLINK) $(TEST_filterbank_OBJECTS) $(TEST_filterbank_LDADD) $(LIBS)
+DEMO_filterbank$(EXEEXT): $(DEMO_filterbank_OBJECTS) $(DEMO_filterbank_DEPENDENCIES) $(EXTRA_DEMO_filterbank_DEPENDENCIES) 
+	@rm -f DEMO_filterbank$(EXEEXT)
+	$(AM_V_CXXLD)$(CXXLINK) $(DEMO_filterbank_OBJECTS) $(DEMO_filterbank_LDADD) $(LIBS)
 
-TEST_ihc$(EXEEXT): $(TEST_ihc_OBJECTS) $(TEST_ihc_DEPENDENCIES) $(EXTRA_TEST_ihc_DEPENDENCIES) 
-	@rm -f TEST_ihc$(EXEEXT)
-	$(AM_V_CXXLD)$(CXXLINK) $(TEST_ihc_OBJECTS) $(TEST_ihc_LDADD) $(LIBS)
+DEMO_ihc$(EXEEXT): $(DEMO_ihc_OBJECTS) $(DEMO_ihc_DEPENDENCIES) $(EXTRA_DEMO_ihc_DEPENDENCIES) 
+	@rm -f DEMO_ihc$(EXEEXT)
+	$(AM_V_CXXLD)$(CXXLINK) $(DEMO_ihc_OBJECTS) $(DEMO_ihc_LDADD) $(LIBS)
 
-TEST_ild$(EXEEXT): $(TEST_ild_OBJECTS) $(TEST_ild_DEPENDENCIES) $(EXTRA_TEST_ild_DEPENDENCIES) 
-	@rm -f TEST_ild$(EXEEXT)
-	$(AM_V_CXXLD)$(CXXLINK) $(TEST_ild_OBJECTS) $(TEST_ild_LDADD) $(LIBS)
+DEMO_ild$(EXEEXT): $(DEMO_ild_OBJECTS) $(DEMO_ild_DEPENDENCIES) $(EXTRA_DEMO_ild_DEPENDENCIES) 
+	@rm -f DEMO_ild$(EXEEXT)
+	$(AM_V_CXXLD)$(CXXLINK) $(DEMO_ild_OBJECTS) $(DEMO_ild_LDADD) $(LIBS)
 
-TEST_input$(EXEEXT): $(TEST_input_OBJECTS) $(TEST_input_DEPENDENCIES) $(EXTRA_TEST_input_DEPENDENCIES) 
-	@rm -f TEST_input$(EXEEXT)
-	$(AM_V_CXXLD)$(CXXLINK) $(TEST_input_OBJECTS) $(TEST_input_LDADD) $(LIBS)
+DEMO_input$(EXEEXT): $(DEMO_input_OBJECTS) $(DEMO_input_DEPENDENCIES) $(EXTRA_DEMO_input_DEPENDENCIES) 
+	@rm -f DEMO_input$(EXEEXT)
+	$(AM_V_CXXLD)$(CXXLINK) $(DEMO_input_OBJECTS) $(DEMO_input_LDADD) $(LIBS)
 
-TEST_itd$(EXEEXT): $(TEST_itd_OBJECTS) $(TEST_itd_DEPENDENCIES) $(EXTRA_TEST_itd_DEPENDENCIES) 
-	@rm -f TEST_itd$(EXEEXT)
-	$(AM_V_CXXLD)$(CXXLINK) $(TEST_itd_OBJECTS) $(TEST_itd_LDADD) $(LIBS)
+DEMO_itd$(EXEEXT): $(DEMO_itd_OBJECTS) $(DEMO_itd_DEPENDENCIES) $(EXTRA_DEMO_itd_DEPENDENCIES) 
+	@rm -f DEMO_itd$(EXEEXT)
+	$(AM_V_CXXLD)$(CXXLINK) $(DEMO_itd_OBJECTS) $(DEMO_itd_LDADD) $(LIBS)
 
-TEST_preProc$(EXEEXT): $(TEST_preProc_OBJECTS) $(TEST_preProc_DEPENDENCIES) $(EXTRA_TEST_preProc_DEPENDENCIES) 
-	@rm -f TEST_preProc$(EXEEXT)
-	$(AM_V_CXXLD)$(CXXLINK) $(TEST_preProc_OBJECTS) $(TEST_preProc_LDADD) $(LIBS)
+DEMO_preProc$(EXEEXT): $(DEMO_preProc_OBJECTS) $(DEMO_preProc_DEPENDENCIES) $(EXTRA_DEMO_preProc_DEPENDENCIES) 
+	@rm -f DEMO_preProc$(EXEEXT)
+	$(AM_V_CXXLD)$(CXXLINK) $(DEMO_preProc_OBJECTS) $(DEMO_preProc_LDADD) $(LIBS)
 
-TEST_ratemap$(EXEEXT): $(TEST_ratemap_OBJECTS) $(TEST_ratemap_DEPENDENCIES) $(EXTRA_TEST_ratemap_DEPENDENCIES) 
-	@rm -f TEST_ratemap$(EXEEXT)
-	$(AM_V_CXXLD)$(CXXLINK) $(TEST_ratemap_OBJECTS) $(TEST_ratemap_LDADD) $(LIBS)
+DEMO_ratemap$(EXEEXT): $(DEMO_ratemap_OBJECTS) $(DEMO_ratemap_DEPENDENCIES) $(EXTRA_DEMO_ratemap_DEPENDENCIES) 
+	@rm -f DEMO_ratemap$(EXEEXT)
+	$(AM_V_CXXLD)$(CXXLINK) $(DEMO_ratemap_OBJECTS) $(DEMO_ratemap_LDADD) $(LIBS)
 
 mostlyclean-compile:
 	-rm -f *.$(OBJEXT)
@@ -503,14 +500,14 @@ mostlyclean-compile:
 distclean-compile:
 	-rm -f *.tab.c
 
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/TEST_crossCorrelation.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/TEST_filterbank.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/TEST_ihc.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/TEST_ild.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/TEST_input.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/TEST_itd.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/TEST_preProc.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/TEST_ratemap.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/DEMO_crossCorrelation.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/DEMO_filterbank.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/DEMO_ihc.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/DEMO_ild.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/DEMO_input.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/DEMO_itd.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/DEMO_preProc.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/DEMO_ratemap.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/matFiles.Po@am__quote@
 
 .cpp.o:

@@ -1,35 +1,33 @@
-bin_PROGRAMS = TEST_input TEST_preProc TEST_filterbank TEST_ihc TEST_ild TEST_ratemap TEST_crossCorrelation TEST_itd
+bin_PROGRAMS = DEMO_input DEMO_preProc DEMO_filterbank DEMO_ihc DEMO_ild DEMO_ratemap DEMO_crossCorrelation DEMO_itd
 
-MATLAB_DIR = '/usr/local/MATLAB/R2015a'
 MATFILESLIB_LIBS = -lmat -lmx
 
-AM_CXXFLAGS=$(CPPFLAGS)
-AM_CXXFLAGS+= -I$(MATLAB_DIR)/extern/include -L$(MATLAB_DIR)/bin/glnxa64 -Wl,-rpath=$(MATLAB_DIR)/bin/glnxa64
+AM_CXXFLAGS=$(CPPFLAGS) $(CXXFLAGS)
 
 noinst_LIBRARIES = libmatFiles.a
 libmatFiles_a_SOURCES = matFiles.hpp
 libmatFiles_a_SOURCES += matFiles.cpp 
 
-TEST_input_SOURCES = TEST_input.cpp
-TEST_input_LDADD = ../src/libopenAFE.la libmatFiles.a $(MATFILESLIB_LIBS)
+DEMO_input_SOURCES = DEMO_input.cpp
+DEMO_input_LDADD = ../src/libopenAFE.la libmatFiles.a $(MATFILESLIB_LIBS)
 
-TEST_preProc_SOURCES = TEST_preProc.cpp
-TEST_preProc_LDADD = ../src/libopenAFE.la libmatFiles.a $(MATFILESLIB_LIBS)
+DEMO_preProc_SOURCES = DEMO_preProc.cpp
+DEMO_preProc_LDADD = ../src/libopenAFE.la libmatFiles.a $(MATFILESLIB_LIBS)
 
-TEST_filterbank_SOURCES = TEST_filterbank.cpp
-TEST_filterbank_LDADD = ../src/libopenAFE.la libmatFiles.a $(MATFILESLIB_LIBS)
+DEMO_filterbank_SOURCES = DEMO_filterbank.cpp
+DEMO_filterbank_LDADD = ../src/libopenAFE.la libmatFiles.a $(MATFILESLIB_LIBS)
 
-TEST_ihc_SOURCES = TEST_ihc.cpp
-TEST_ihc_LDADD = ../src/libopenAFE.la libmatFiles.a $(MATFILESLIB_LIBS)
+DEMO_ihc_SOURCES = DEMO_ihc.cpp
+DEMO_ihc_LDADD = ../src/libopenAFE.la libmatFiles.a $(MATFILESLIB_LIBS)
 
-TEST_ild_SOURCES = TEST_ild.cpp
-TEST_ild_LDADD = ../src/libopenAFE.la libmatFiles.a $(MATFILESLIB_LIBS)
+DEMO_ild_SOURCES = DEMO_ild.cpp
+DEMO_ild_LDADD = ../src/libopenAFE.la libmatFiles.a $(MATFILESLIB_LIBS)
 
-TEST_ratemap_SOURCES = TEST_ratemap.cpp
-TEST_ratemap_LDADD = ../src/libopenAFE.la libmatFiles.a $(MATFILESLIB_LIBS)
+DEMO_ratemap_SOURCES = DEMO_ratemap.cpp
+DEMO_ratemap_LDADD = ../src/libopenAFE.la libmatFiles.a $(MATFILESLIB_LIBS)
 
-TEST_crossCorrelation_SOURCES = TEST_crossCorrelation.cpp
-TEST_crossCorrelation_LDADD = ../src/libopenAFE.la libmatFiles.a $(MATFILESLIB_LIBS)
+DEMO_crossCorrelation_SOURCES = DEMO_crossCorrelation.cpp
+DEMO_crossCorrelation_LDADD = ../src/libopenAFE.la libmatFiles.a $(MATFILESLIB_LIBS)
 
-TEST_itd_SOURCES = TEST_itd.cpp
-TEST_itd_LDADD = ../src/libopenAFE.la libmatFiles.a $(MATFILESLIB_LIBS)
+DEMO_itd_SOURCES = DEMO_itd.cpp
+DEMO_itd_LDADD = ../src/libopenAFE.la libmatFiles.a $(MATFILESLIB_LIBS)

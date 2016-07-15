@@ -2981,7 +2981,10 @@ ac_link='$CXX -o conftest$ac_exeext $CXXFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ex
 ac_compiler_gnu=$ac_cv_cxx_compiler_gnu
 
 
+
 have_pthreads=no
+have_matlab=no
+
 DEPDIR="${am__leading_dot}deps"
 
 ac_config_commands="$ac_config_commands depfiles"
@@ -3737,6 +3740,120 @@ if test "$ac_res" != no; then :
   have_pthreads=yes
 fi
 
+
+{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for library containing matOpen" >&5
+$as_echo_n "checking for library containing matOpen... " >&6; }
+if ${ac_cv_search_matOpen+:} false; then :
+  $as_echo_n "(cached) " >&6
+else
+  ac_func_search_save_LIBS=$LIBS
+cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+/* end confdefs.h.  */
+
+/* Override any GCC internal prototype to avoid an error.
+   Use char because int might match the return type of a GCC
+   builtin and then its argument prototype would still apply.  */
+#ifdef __cplusplus
+extern "C"
+#endif
+char matOpen ();
+int
+main ()
+{
+return matOpen ();
+  ;
+  return 0;
+}
+_ACEOF
+for ac_lib in '' mat; do
+  if test -z "$ac_lib"; then
+    ac_res="none required"
+  else
+    ac_res=-l$ac_lib
+    LIBS="-l$ac_lib  $ac_func_search_save_LIBS"
+  fi
+  if ac_fn_cxx_try_link "$LINENO"; then :
+  ac_cv_search_matOpen=$ac_res
+fi
+rm -f core conftest.err conftest.$ac_objext \
+    conftest$ac_exeext
+  if ${ac_cv_search_matOpen+:} false; then :
+  break
+fi
+done
+if ${ac_cv_search_matOpen+:} false; then :
+
+else
+  ac_cv_search_matOpen=no
+fi
+rm conftest.$ac_ext
+LIBS=$ac_func_search_save_LIBS
+fi
+{ $as_echo "$as_me:${as_lineno-$LINENO}: result: $ac_cv_search_matOpen" >&5
+$as_echo "$ac_cv_search_matOpen" >&6; }
+ac_res=$ac_cv_search_matOpen
+if test "$ac_res" != no; then :
+  test "$ac_res" = "none required" || LIBS="$ac_res $LIBS"
+  have_matlab=yes
+fi
+
+{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for library containing mxCreateDoubleScalar" >&5
+$as_echo_n "checking for library containing mxCreateDoubleScalar... " >&6; }
+if ${ac_cv_search_mxCreateDoubleScalar+:} false; then :
+  $as_echo_n "(cached) " >&6
+else
+  ac_func_search_save_LIBS=$LIBS
+cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+/* end confdefs.h.  */
+
+/* Override any GCC internal prototype to avoid an error.
+   Use char because int might match the return type of a GCC
+   builtin and then its argument prototype would still apply.  */
+#ifdef __cplusplus
+extern "C"
+#endif
+char mxCreateDoubleScalar ();
+int
+main ()
+{
+return mxCreateDoubleScalar ();
+  ;
+  return 0;
+}
+_ACEOF
+for ac_lib in '' mx; do
+  if test -z "$ac_lib"; then
+    ac_res="none required"
+  else
+    ac_res=-l$ac_lib
+    LIBS="-l$ac_lib  $ac_func_search_save_LIBS"
+  fi
+  if ac_fn_cxx_try_link "$LINENO"; then :
+  ac_cv_search_mxCreateDoubleScalar=$ac_res
+fi
+rm -f core conftest.err conftest.$ac_objext \
+    conftest$ac_exeext
+  if ${ac_cv_search_mxCreateDoubleScalar+:} false; then :
+  break
+fi
+done
+if ${ac_cv_search_mxCreateDoubleScalar+:} false; then :
+
+else
+  ac_cv_search_mxCreateDoubleScalar=no
+fi
+rm conftest.$ac_ext
+LIBS=$ac_func_search_save_LIBS
+fi
+{ $as_echo "$as_me:${as_lineno-$LINENO}: result: $ac_cv_search_mxCreateDoubleScalar" >&5
+$as_echo "$ac_cv_search_mxCreateDoubleScalar" >&6; }
+ac_res=$ac_cv_search_mxCreateDoubleScalar
+if test "$ac_res" != no; then :
+  test "$ac_res" = "none required" || LIBS="$ac_res $LIBS"
+  have_matlab=yes
+fi
+
+
 ac_ext=cpp
 ac_cpp='$CXXCPP $CPPFLAGS'
 ac_compile='$CXX -c $CXXFLAGS $CPPFLAGS conftest.$ac_ext >&5'
@@ -4155,6 +4272,23 @@ _ACEOF
 
 else
   have_pthreads=no
+fi
+
+done
+
+fi
+
+if test "x${have_matlab}" = "xyes"; then
+  for ac_header in mat.h
+do :
+  ac_fn_cxx_check_header_mongrel "$LINENO" "mat.h" "ac_cv_header_mat_h" "$ac_includes_default"
+if test "x$ac_cv_header_mat_h" = xyes; then :
+  cat >>confdefs.h <<_ACEOF
+#define HAVE_MAT_H 1
+_ACEOF
+
+else
+  have_matlab=no
 fi
 
 done
@@ -15423,9 +15557,27 @@ ac_compile='$CXX -c $CXXFLAGS $CPPFLAGS conftest.$ac_ext >&5'
 ac_link='$CXX -o conftest$ac_exeext $CXXFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $LIBS >&5'
 ac_compiler_gnu=$ac_cv_cxx_compiler_gnu
 
-CPPFLAGS='-Wall -Wsign-compare -std=c++11 -pthread -D_REENTRANT -DHAVE_INLINE'
+CXXFLAGS='-Wall -Wsign-compare -std=c++11 -pthread -D_REENTRANT -DHAVE_INLINE'
+#CPPFLAGS='-Wall -Wsign-compare -std=c++11 -pthread -D_REENTRANT -DHAVE_INLINE'
 
-ac_config_files="$ac_config_files Makefile src/Makefile src/tools/Makefile src/Signals/Makefile src/Filters/Makefile src/Processors/Makefile examples/Makefile"
+
+ac_config_files="$ac_config_files Makefile"
+
+ac_config_files="$ac_config_files src/Makefile"
+
+ac_config_files="$ac_config_files src/tools/Makefile"
+
+ac_config_files="$ac_config_files src/Signals/Makefile"
+
+ac_config_files="$ac_config_files src/Filters/Makefile"
+
+ac_config_files="$ac_config_files src/Processors/Makefile"
+
+
+if test "x${have_matlab}" = "xyes"; then
+  ac_config_files="$ac_config_files examples/Makefile"
+
+fi
 
 cat >confcache <<\_ACEOF
 # This file is a shell script that caches the results of configure

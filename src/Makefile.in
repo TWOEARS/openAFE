@@ -367,7 +367,7 @@ top_builddir = @top_builddir@
 top_srcdir = @top_srcdir@
 SUBDIRS = tools Signals Filters Processors
 AUTOMAKE_OPTIONS = subdir-objects
-AM_CXXFLAGS = $(CPPFLAGS) -lfftw3 -lm
+AM_CXXFLAGS = $(CXXFLAGS) -lfftw3 -lm
 lib_LTLIBRARIES = libopenAFE.la
 libopenAFE_la_SOURCES = tools/window.cpp Signals/Signal.cpp \
 	Filters/bwIIR.cpp Filters/bwCoef.cpp Filters/bwFilter.cpp \

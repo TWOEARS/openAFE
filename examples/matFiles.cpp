@@ -157,7 +157,7 @@
 		MATFile *pmat;
 
 		/* Variables for mxArrays  */
-		mxArray *pn_l, *pn_r, *pn2;
+		mxArray *pn_l = NULL, *pn_r = NULL, *pn2 = NULL;
 
 		pmat = matOpen(file, "w");
 		if (pmat == NULL) {
@@ -218,7 +218,7 @@
 		MATFile *pmat;
 
 		/* Variables for mxArrays  */
-		mxArray *pn_l, *pn2;
+		mxArray *pn_l = NULL, *pn2 = NULL;
 		
 		pmat = matOpen(file, "w");
 		if (pmat == NULL) {
