@@ -69,9 +69,7 @@ using namespace std;
 						
 						// Lag of most salient peak
 						double lagInt = lags[index];
-						std::cout << "Lag int is " << lagInt << std::endl;
-						sleep(1);
-						
+			
 					}
 				}				
 			}

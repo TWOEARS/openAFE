@@ -2985,6 +2985,8 @@ ac_compiler_gnu=$ac_cv_cxx_compiler_gnu
 have_pthreads=no
 have_matlab=no
 
+dont_install=no
+
 DEPDIR="${am__leading_dot}deps"
 
 ac_config_commands="$ac_config_commands depfiles"
@@ -3738,6 +3740,8 @@ ac_res=$ac_cv_search_pthread_create
 if test "$ac_res" != no; then :
   test "$ac_res" = "none required" || LIBS="$ac_res $LIBS"
   have_pthreads=yes
+else
+  dont_install=yes
 fi
 
 
@@ -3850,7 +3854,9 @@ $as_echo "$ac_cv_search_mxCreateDoubleScalar" >&6; }
 ac_res=$ac_cv_search_mxCreateDoubleScalar
 if test "$ac_res" != no; then :
   test "$ac_res" = "none required" || LIBS="$ac_res $LIBS"
-  have_matlab=yes
+  
+else
+  have_matlab=no
 fi
 
 
@@ -4247,7 +4253,7 @@ fi
 done
 
 
-for ac_header in string.h memory.h stdlib.h fftw3.h
+for ac_header in string.h memory.h stdlib.h fftw3.h boost/circular_buffer.hpp
 do :
   as_ac_Header=`$as_echo "ac_cv_header_$ac_header" | $as_tr_sh`
 ac_fn_cxx_check_header_mongrel "$LINENO" "$ac_header" "$as_ac_Header" "$ac_includes_default"
@@ -4256,6 +4262,8 @@ if eval test \"x\$"$as_ac_Header"\" = x"yes"; then :
 @%:@define `$as_echo "HAVE_$ac_header" | $as_tr_cpp` 1
 _ACEOF
  
+else
+  dont_install=yes
 fi
 
 done
@@ -15558,25 +15566,36 @@ ac_link='$CXX -o conftest$ac_exeext $CXXFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ex
 ac_compiler_gnu=$ac_cv_cxx_compiler_gnu
 
 CXXFLAGS='-Wall -Wsign-compare -std=c++11 -pthread -D_REENTRANT -DHAVE_INLINE'
-#CPPFLAGS='-Wall -Wsign-compare -std=c++11 -pthread -D_REENTRANT -DHAVE_INLINE'
 
 
-ac_config_files="$ac_config_files Makefile"
+if test "x${dont_install}" = "xno"; then
+  ac_config_files="$ac_config_files Makefile"
 
-ac_config_files="$ac_config_files src/Makefile"
+  ac_config_files="$ac_config_files src/Makefile"
 
-ac_config_files="$ac_config_files src/tools/Makefile"
+  ac_config_files="$ac_config_files src/tools/Makefile"
 
-ac_config_files="$ac_config_files src/Signals/Makefile"
+  ac_config_files="$ac_config_files src/Signals/Makefile"
 
-ac_config_files="$ac_config_files src/Filters/Makefile"
+  ac_config_files="$ac_config_files src/Filters/Makefile"
 
-ac_config_files="$ac_config_files src/Processors/Makefile"
+  ac_config_files="$ac_config_files src/Processors/Makefile"
 
+  if test "x${have_matlab}" = "xyes"; then
+    ac_config_files="$ac_config_files examples/Makefile"
 
-if test "x${have_matlab}" = "xyes"; then
-  ac_config_files="$ac_config_files examples/Makefile"
-
+  fi
+else
+  { $as_echo "$as_me:${as_lineno-$LINENO}: ----------------------------------------------------------------------------------------------------" >&5
+$as_echo "$as_me: ----------------------------------------------------------------------------------------------------" >&6;}
+  { $as_echo "$as_me:${as_lineno-$LINENO}: ----------------------------------------------------------------------------------------------------" >&5
+$as_echo "$as_me: ----------------------------------------------------------------------------------------------------" >&6;}
+  { $as_echo "$as_me:${as_lineno-$LINENO}: --------------------------------Please install the mising libraries.--------------------------------" >&5
+$as_echo "$as_me: --------------------------------Please install the mising libraries.--------------------------------" >&6;}
+  { $as_echo "$as_me:${as_lineno-$LINENO}: ----------------------------------------------------------------------------------------------------" >&5
+$as_echo "$as_me: ----------------------------------------------------------------------------------------------------" >&6;}
+  { $as_echo "$as_me:${as_lineno-$LINENO}: ----------------------------------------------------------------------------------------------------" >&5
+$as_echo "$as_me: ----------------------------------------------------------------------------------------------------" >&6;}
 fi
 
 cat >confcache <<\_ACEOF

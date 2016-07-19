@@ -217,7 +217,7 @@
 	int matFiles::writeXCORRMatFile(const char *file, std::vector<std::vector<std::shared_ptr<openAFE::twoCTypeBlock<double> > > >& left, double fsHz) {
 		MATFile *pmat;
 
-		/* Variables for mxArrays  */
+		/* Variables for mxArrays */
 		mxArray *pn_l = NULL, *pn2 = NULL;
 		
 		pmat = matOpen(file, "w");

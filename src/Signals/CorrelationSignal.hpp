@@ -142,9 +142,6 @@ namespace openAFE {
 		}
 		
 		std::size_t getSize() {
-			std::cout << this->buffer.size() << std::endl; 
-			std::cout << this->buffer[0].size() << std::endl; 
-
 			return this->buffer[0][0]->getSize();
 		}
 		
