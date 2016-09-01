@@ -10,12 +10,14 @@
 #include "../tools/mathTools.hpp"
 
 /* 
- * inputProc is the first processor to receve the audio.
- * It has two time domain signals as output (left and right).
- * As input, it can accept just one dimentinal and continous data
- * per channel.
+ * inputProc is the first processor of the processor tree. It receves the audio
+ * from any classical C type arrays and stores the data in  two time domain signals (left and right).
  * 
- * It has no parameters. As processing, it normalises the input signal.
+ * When needed, the inputProc normalizes that input data as well.
+ * 
+ * in_doNormalize : flag to activatedesactivate the normalization
+ * in_normalizeValue : th normalization value
+ * 
  * */
  
 namespace openAFE {

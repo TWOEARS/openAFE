@@ -1,4 +1,4 @@
-bin_PROGRAMS = DEMO_input DEMO_preProc DEMO_filterbank DEMO_ihc DEMO_ild DEMO_ratemap DEMO_crossCorrelation DEMO_itd
+bin_PROGRAMS = DEMO_input DEMO_preProc DEMO_filterbank DEMO_ihc DEMO_ild DEMO_ratemap DEMO_crossCorrelation
 
 MATFILESLIB_LIBS = -lmat -lmx
 
@@ -28,6 +28,3 @@ DEMO_ratemap_LDADD = ../src/libopenAFE.la libmatFiles.a $(MATFILESLIB_LIBS)
 
 DEMO_crossCorrelation_SOURCES = DEMO_crossCorrelation.cpp
 DEMO_crossCorrelation_LDADD = ../src/libopenAFE.la libmatFiles.a $(MATFILESLIB_LIBS)
-
-DEMO_itd_SOURCES = DEMO_itd.cpp
-DEMO_itd_LDADD = ../src/libopenAFE.la libmatFiles.a $(MATFILESLIB_LIBS)

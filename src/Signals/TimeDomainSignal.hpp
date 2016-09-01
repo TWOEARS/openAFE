@@ -47,19 +47,16 @@ namespace openAFE {
 		}
 		
 		std::shared_ptr<twoCTypeBlock<T> > getLastChunkAccesor() {
-			this->buffer->calcLastChunk();
 			this->lastChunkInfo->setData( this->buffer->getLastChunkAccesor() );
 			return this->lastChunkInfo;
 		}
 
 		std::shared_ptr<twoCTypeBlock<T> > getWholeBufferAccesor() {
-			this->buffer->calcWholeBuffer();
 			this->wholeBufferInfo->setData( this->buffer->getWholeBufferAccesor() );
 			return this->wholeBufferInfo;
 		}
 
 		std::shared_ptr<twoCTypeBlock<T> > getOldDataAccesor() {
-			this->buffer->calcOldData();
 			this->oldDataInfo->setData( this->buffer->getOldDataAccesor() );
 			return this->oldDataInfo;
 		}

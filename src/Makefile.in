@@ -135,7 +135,7 @@ am_libopenAFE_la_OBJECTS = tools/window.lo Signals/Signal.lo \
 	Processors/ihcProc.lo Processors/windowBasedProcs.lo \
 	Processors/ildProc.lo Processors/ratemap.lo \
 	Processors/windowBasedLAGProcs.lo \
-	Processors/crossCorrelation.lo Processors/itdProc.lo
+	Processors/crossCorrelation.lo
 libopenAFE_la_OBJECTS = $(am_libopenAFE_la_OBJECTS)
 AM_V_lt = $(am__v_lt_@AM_V@)
 am__v_lt_ = $(am__v_lt_@AM_DEFAULT_V@)
@@ -377,7 +377,7 @@ libopenAFE_la_SOURCES = tools/window.cpp Signals/Signal.cpp \
 	Processors/ihcProc.cpp Processors/windowBasedProcs.cpp \
 	Processors/ildProc.cpp Processors/ratemap.cpp \
 	Processors/windowBasedLAGProcs.cpp \
-	Processors/crossCorrelation.cpp Processors/itdProc.cpp
+	Processors/crossCorrelation.cpp
 libopenAFE_la_LIBADD = tools/libtools.a Signals/libsignals.a \
 	Filters/libfilters.a Processors/libprocessors.a
 toolsdir = $(pkgincludedir)/tools
@@ -398,7 +398,7 @@ processor_HEADERS = Processors/Processor.hpp \
 	Processors/ihcProc.hpp Processors/windowBasedProcs.hpp \
 	Processors/ildProc.hpp Processors/ratemap.hpp \
 	Processors/LAGProcessor.hpp Processors/windowBasedLAGProcs.hpp \
-	Processors/crossCorrelation.hpp Processors/itdProc.hpp
+	Processors/crossCorrelation.hpp
 all: all-recursive
 
 .SUFFIXES:
@@ -525,8 +525,6 @@ Processors/windowBasedLAGProcs.lo: Processors/$(am__dirstamp) \
 	Processors/$(DEPDIR)/$(am__dirstamp)
 Processors/crossCorrelation.lo: Processors/$(am__dirstamp) \
 	Processors/$(DEPDIR)/$(am__dirstamp)
-Processors/itdProc.lo: Processors/$(am__dirstamp) \
-	Processors/$(DEPDIR)/$(am__dirstamp)
 
 libopenAFE.la: $(libopenAFE_la_OBJECTS) $(libopenAFE_la_DEPENDENCIES) $(EXTRA_libopenAFE_la_DEPENDENCIES) 
 	$(AM_V_CXXLD)$(CXXLINK) -rpath $(libdir) $(libopenAFE_la_OBJECTS) $(libopenAFE_la_LIBADD) $(LIBS)
@@ -556,7 +554,6 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@Processors/$(DEPDIR)/ihcProc.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@Processors/$(DEPDIR)/ildProc.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@Processors/$(DEPDIR)/inputProc.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@Processors/$(DEPDIR)/itdProc.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@Processors/$(DEPDIR)/preProc.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@Processors/$(DEPDIR)/ratemap.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@Processors/$(DEPDIR)/windowBasedLAGProcs.Plo@am__quote@

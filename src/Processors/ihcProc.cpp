@@ -1,6 +1,10 @@
 #include "ihcProc.hpp"
 
+#include <numeric>
+#include <chrono>
+
 using namespace openAFE;
+using namespace std;
 
 			void IHCProc::populateFilters( filterPtrVector& filters ) {
 
@@ -43,112 +47,70 @@ using namespace openAFE;
 
 			}
 
-			void IHCProc::processFilteringChannel ( bwFilterPtr filter, std::shared_ptr<twoCTypeBlock<double> > oneChannel ) {
-				// 0- Initialization
-				size_t dim1 = oneChannel->array1.second;
-				size_t dim2 = oneChannel->array2.second;
-							
-				double* firstValue1 = oneChannel->array1.first;
-				double* firstValue2 = oneChannel->array2.first;
+			void IHCProc::processHalfWave ( size_t& dim1_l, size_t& dim2_l, double* firstValue1_l, double* firstValue2_l, size_t& dim1_r, size_t& dim2_r, double* firstValue1_r, double* firstValue2_r ) {
+						
+				// Halfwave rectification
+				size_t ii;
+				for ( ii = 0 ; ii < dim1_l ; ++ii ) {
+					*( firstValue1_l + ii ) = fmax( *( firstValue1_l + ii ), 0 );
+					*( firstValue1_r + ii ) = fmax( *( firstValue1_r + ii ), 0 );					
+				}
+				
+				if ( dim2_l > 0 ) {
+					 for ( ii = 0 ; ii < dim2_l ; ++ii ) {
+						*( firstValue2_l + ii ) = fmax( *( firstValue2_l + ii ), 0 );
+						*( firstValue2_r + ii ) = fmax( *( firstValue2_r + ii ), 0 );						
+					}	
+				}
+			}	
 			
-                 switch ( this->method ) {
+			void IHCProc::processFullWave ( size_t& dim1_l, size_t& dim2_l, double* firstValue1_l, double* firstValue2_l, size_t& dim1_r, size_t& dim2_r, double* firstValue1_r, double* firstValue2_r ) {
+						
+				// Halfwave rectification
+				size_t ii;
+				for ( ii = 0 ; ii < dim1_l ; ++ii ) {
+					*( firstValue1_l + ii ) = fabs( *( firstValue1_l + ii ) );
+					*( firstValue1_r + ii ) = fabs( *( firstValue1_r + ii ) );					
+				}
+				
+				if ( dim2_l > 0 ) {
+					 for ( ii = 0 ; ii < dim2_l ; ++ii ) {
+						*( firstValue2_l + ii ) = fabs( *( firstValue2_l + ii ) );
+						*( firstValue2_r + ii ) = fabs( *( firstValue2_r + ii ) );						
+					}	
+				}
+			}				
 
-                     case _joergensen:
-						// TODO : implement THIS
-						break;
-					 case _dau:
-					 
-						// Halfwave rectification
-						if ( dim1 > 0 )
-							for ( size_t ii = 0 ; ii < dim1 ; ++ii )
-								*( firstValue1 + ii ) = fmax( *( firstValue1 + ii ), 0 );
-						if ( dim2 > 0 )
-							for ( size_t ii = 0 ; ii < dim2 ; ++ii )
-								*( firstValue2 + ii ) = fmax( *( firstValue2 + ii ), 0 );
+			void IHCProc::processSquare ( size_t& dim1_l, size_t& dim2_l, double* firstValue1_l, double* firstValue2_l, size_t& dim1_r, size_t& dim2_r, double* firstValue1_r, double* firstValue2_r ) {
+						
+				// Halfwave rectification
+				size_t ii;
+				for ( ii = 0 ; ii < dim1_l ; ++ii ) {
+					*( firstValue1_l + ii ) = pow( fabs( *( firstValue1_l + ii ) ), 2 );
+					*( firstValue1_r + ii ) = pow( fabs( *( firstValue1_r + ii ) ), 2 );					
+				}
+				
+				if ( dim2_l > 0 ) {
+					 for ( ii = 0 ; ii < dim2_l ; ++ii ) {
+						*( firstValue2_l + ii ) = pow( fabs( *( firstValue2_l + ii ) ), 2 );
+						*( firstValue2_r + ii ) = pow( fabs( *( firstValue2_r + ii ) ), 2 );				
+					}	
+				}
+			}					
+															
+			void IHCProc::processDAU ( size_t& dim1_l, size_t& dim2_l, double* firstValue1_l, double* firstValue2_l, bwFilterPtr filter_l, size_t& dim1_r, size_t& dim2_r, double* firstValue1_r, double* firstValue2_r, bwFilterPtr filter_r ) {
+						
+				// Halfwave rectification
+				this->processHalfWave ( dim1_l, dim2_l, firstValue1_l, firstValue2_l, dim1_r, dim2_r, firstValue1_r, firstValue2_r );
 								
-						// Filtering
-						if ( dim1 > 0 )
-						    filter->exec( firstValue1, dim1, firstValue1 );
-						if ( dim2 > 0 )
-						    filter->exec( firstValue2, dim2, firstValue2 );
-
-					 	break;
-					 	
-					 case _breebart:
-						// TODO : implement THIS (filters are not initialized)
-
-					 	break;
-					 	
-					 case _bernstein:
-						// TODO : implement THIS
-
-					 	break;
-					 	
-					 default:
-					 
-						break;
-				}					
-			}
-			
-			void IHCProc::processChannel ( std::shared_ptr<twoCTypeBlock<double> > oneChannel ) {
-				// 0- Initialization
-				size_t dim1 = oneChannel->array1.second;
-				size_t dim2 = oneChannel->array2.second;
-							
-				double* firstValue1 = oneChannel->array1.first;
-				double* firstValue2 = oneChannel->array2.first;
-
-                 switch ( this->method ) {
-
-                     case _none:
-						// Nothing
-						break;
-					 case _halfwave:
-
-						if ( dim1 > 0 )
-							for ( size_t ii = 0 ; ii < dim1 ; ++ii )
-								*( firstValue1 + ii ) = fmax( *( firstValue1 + ii ), 0 );
-						if ( dim2 > 0 )
-							for ( size_t ii = 0 ; ii < dim2 ; ++ii )
-								*( firstValue2 + ii ) = fmax( *( firstValue2 + ii ), 0 );
-					 	break;
-					 	
-					 case _fullwave:
-					 
-						if ( dim1 > 0 )
-							for ( size_t ii = 0 ; ii < dim1 ; ++ii )
-								*( firstValue1 + ii ) = fabs( *( firstValue1 + ii ) );
-						if ( dim2 > 0 )	
-							for ( size_t ii = 0 ; ii < dim2 ; ++ii )
-								*( firstValue2 + ii ) = fabs( *( firstValue2 + ii ) );	 
-					 	break;
-					 	
-					 case _square:
-
-						if ( dim1 > 0 )
-							for ( size_t ii = 0 ; ii < dim1 ; ++ii )
-								*( firstValue1 + ii ) = pow( fabs( *( firstValue1 + ii ) ), 2 );
-						if ( dim2 > 0 )	
-							for ( size_t ii = 0 ; ii < dim2 ; ++ii )
-								*( firstValue2 + ii ) = pow( fabs( *( firstValue2 + ii ) ), 2 );						 
-					 	break;
-					 	
-					 default:
-						break;
-				}					
-			}
-			
-			void IHCProc::processLR ( filterPtrVector& filters, std::vector<std::shared_ptr<twoCTypeBlock<double> > > PMZ ) {
-				std::vector<std::thread> threads;
-				  for ( size_t ii = 0 ; ii < this->get_nChannel() ; ++ii ) {
-					  if ( ( ( this->method == _joergensen ) or ( this->method == _dau ) or ( this->method == _breebart ) or ( this->method == _bernstein ) ) and ( filters.size() > 0 ) )
-						threads.push_back(std::thread( &IHCProc::processFilteringChannel, this, filters[ii], PMZ[ii] ));
-					  else threads.push_back(std::thread( &IHCProc::processChannel, this, PMZ[ii] ));
-				   }
-
-				  // Waiting to join the threads
-				  for (auto& t : threads)
-					t.join();
+				// Filtering
+				filter_l->exec( firstValue1_l, dim1_l, firstValue1_l );
+				filter_r->exec( firstValue1_r, dim1_r, firstValue1_r );
+				
+				if ( dim2_l > 0 ) {
+					filter_l->exec( firstValue2_l, dim2_l, firstValue2_l );
+					filter_r->exec( firstValue2_r, dim2_r, firstValue2_r );
+				}
 			}
 																
 			IHCProc::IHCProc (const std::string nameArg, std::shared_ptr<GammatoneProc > upperProcPtr, ihcMethod method ) : TFSProcessor<double > (nameArg, upperProcPtr->getFsOut(), upperProcPtr->getFsOut(), upperProcPtr->getBufferSize_s(), upperProcPtr->get_nChannel(), _magnitude, _ihc) {
@@ -170,20 +132,57 @@ using namespace openAFE;
 			}
 			
 			void IHCProc::processChunk ( ) {
-				this->setNFR ( this->upperProcPtr->getNFR() );
 
+				this->setNFR ( this->upperProcPtr->getNFR() );
+				
 				// Appending the chunk to process (the processing must be done on the PMZ)
 				leftPMZ->appendChunk( this->upperProcPtr->getLeftLastChunkAccessor() );
 				rightPMZ->appendChunk( this->upperProcPtr->getRightLastChunkAccessor() );
-
-				std::vector<std::shared_ptr<twoCTypeBlock<double> > > l_PMZ = leftPMZ->getLastChunkAccesor();
-				std::vector<std::shared_ptr<twoCTypeBlock<double> > > r_PMZ = rightPMZ->getLastChunkAccesor();
+								
+				vector<shared_ptr<twoCTypeBlock<double> > > l_PMZ = leftPMZ->getLastChunkAccesor();
+				vector<shared_ptr<twoCTypeBlock<double> > > r_PMZ = rightPMZ->getLastChunkAccesor();
 				
-				std::thread leftThread( &IHCProc::processLR, this, std::ref(this->ihcFilter_l), l_PMZ );
-				std::thread rightThread( &IHCProc::processLR, this, std::ref(this->ihcFilter_r), r_PMZ );
+				vector<thread> threads;
+				for ( size_t ii = 0 ; ii < this->get_nChannel() ; ++ii ) {
+					  
+					  size_t dim1_l = l_PMZ[ii]->array1.second;
+					  size_t dim2_l = l_PMZ[ii]->array2.second;
 							
-				leftThread.join();                // pauses until left finishes
-				rightThread.join();               // pauses until right finishes			
+					  double* firstValue1_l = l_PMZ[ii]->array1.first;
+					  double* firstValue2_l = l_PMZ[ii]->array2.first;
+
+					  size_t dim1_r = r_PMZ[ii]->array1.second;
+					  size_t dim2_r = r_PMZ[ii]->array2.second;
+							
+					  double* firstValue1_r = r_PMZ[ii]->array1.first;
+					  double* firstValue2_r = r_PMZ[ii]->array2.first;
+					  				
+					  switch ( this->method ) {
+						  case _none:
+							break;
+						  case _halfwave:
+						    threads.push_back(thread( &IHCProc::processHalfWave, this, ref(dim1_l), ref(dim2_l), firstValue1_l, firstValue2_l, ref(dim1_r), ref(dim2_r), firstValue1_r, firstValue2_r ) );
+							break;
+						  case _fullwave:
+						    threads.push_back(thread( &IHCProc::processFullWave, this, ref(dim1_l), ref(dim2_l), firstValue1_l, firstValue2_l, ref(dim1_r), ref(dim2_r), firstValue1_r, firstValue2_r ) );					 
+							break;
+					      case _square:
+						    threads.push_back(thread( &IHCProc::processSquare, this, ref(dim1_l), ref(dim2_l), firstValue1_l, firstValue2_l, ref(dim1_r), ref(dim2_r), firstValue1_r, firstValue2_r ) );					 							
+							break;
+						  case _joergensen:
+						  case _breebart:
+						  case _bernstein:						  
+						  case _dau:
+							threads.push_back(thread( &IHCProc::processDAU, this, ref(dim1_l), ref(dim2_l), firstValue1_l, firstValue2_l, ref(this->ihcFilter_l[ii]), ref(dim1_r), ref(dim2_r), firstValue1_r, firstValue2_r, ref(this->ihcFilter_r[ii]) ) );
+							break;
+						  default :
+							break;
+					  }
+				   }
+
+				   // Waiting to join the threads
+				   for (auto& t : threads)
+					t.join();	
 			}
 			
 			/* Comapres informations and the current parameters of two processors */

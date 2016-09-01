@@ -74,18 +74,22 @@ namespace openAFE {
         //             - a(2)*y(n-1) - ... - a(na+1)*y(n-na)
 		void exec ( const T_in* srcStart, const std::size_t lenSrc, T_out* destStart ) {
 			if ( this->order > 0 ) {
-				T_in exVar;			
+				
+				T_in exVar;
+				T_out exVarDst;				
+				std::size_t jj;
+				
 				for ( std::size_t ii = 0 ; ii < lenSrc ; ++ii ) {
 					
 					// The srcStart and the destStart can point to the same adress.
 					exVar = *( srcStart + ii );
-					
-					*( destStart + ii ) = exVar * vectB[0] + states[0];
-					std::size_t jj;
+					exVarDst = exVar * vectB[0] + states[0];
+
+					*( destStart + ii ) = exVarDst;
 					for ( jj = 0 ; jj < states.size() - 1 ; ++jj ) {
-						states[ jj ] = states[ jj+1 ] + exVar * this->vectB[ jj+1 ] - *( destStart + ii ) * this->vectA[ jj+1 ];
+						states[ jj ] = states[ jj+1 ] + exVar * this->vectB[ jj+1 ] - exVarDst * this->vectA[ jj+1 ];
 					}
-					states[ jj ] = exVar * this->vectB[ jj+1 ] - *( destStart + ii ) * this->vectA[ jj + 1 ];
+					states[ jj ] = exVar * this->vectB[ jj+1 ] - exVarDst * this->vectA[ jj + 1 ];
 				}
 			} else throw std::string("Filters order is zero.");
 		}

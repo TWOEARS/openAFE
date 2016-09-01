@@ -188,6 +188,7 @@ namespace openAFE {
 			
 			fftw_execute(p);
 
+			fftw_destroy_plan( p );
 			return outVect;
 		}
 		
@@ -206,6 +207,7 @@ namespace openAFE {
 			for ( std::size_t ii = 0 ; ii < fft_N ; ++ii )
 				resultVec[ii] /= fft_N;
 
+			fftw_destroy_plan( ip );
 			return resultVec;
 		}
 

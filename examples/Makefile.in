@@ -81,8 +81,7 @@ build_triplet = @build@
 host_triplet = @host@
 bin_PROGRAMS = DEMO_input$(EXEEXT) DEMO_preProc$(EXEEXT) \
 	DEMO_filterbank$(EXEEXT) DEMO_ihc$(EXEEXT) DEMO_ild$(EXEEXT) \
-	DEMO_ratemap$(EXEEXT) DEMO_crossCorrelation$(EXEEXT) \
-	DEMO_itd$(EXEEXT)
+	DEMO_ratemap$(EXEEXT) DEMO_crossCorrelation$(EXEEXT)
 subdir = examples
 DIST_COMMON = $(srcdir)/Makefile.in $(srcdir)/Makefile.am \
 	$(top_srcdir)/depcomp
@@ -132,10 +131,6 @@ DEMO_ild_DEPENDENCIES = ../src/libopenAFE.la libmatFiles.a \
 am_DEMO_input_OBJECTS = DEMO_input.$(OBJEXT)
 DEMO_input_OBJECTS = $(am_DEMO_input_OBJECTS)
 DEMO_input_DEPENDENCIES = ../src/libopenAFE.la libmatFiles.a \
-	$(am__DEPENDENCIES_1)
-am_DEMO_itd_OBJECTS = DEMO_itd.$(OBJEXT)
-DEMO_itd_OBJECTS = $(am_DEMO_itd_OBJECTS)
-DEMO_itd_DEPENDENCIES = ../src/libopenAFE.la libmatFiles.a \
 	$(am__DEPENDENCIES_1)
 am_DEMO_preProc_OBJECTS = DEMO_preProc.$(OBJEXT)
 DEMO_preProc_OBJECTS = $(am_DEMO_preProc_OBJECTS)
@@ -199,13 +194,12 @@ am__v_CCLD_0 = @echo "  CCLD    " $@;
 am__v_CCLD_1 = 
 SOURCES = $(libmatFiles_a_SOURCES) $(DEMO_crossCorrelation_SOURCES) \
 	$(DEMO_filterbank_SOURCES) $(DEMO_ihc_SOURCES) \
-	$(DEMO_ild_SOURCES) $(DEMO_input_SOURCES) $(DEMO_itd_SOURCES) \
+	$(DEMO_ild_SOURCES) $(DEMO_input_SOURCES) \
 	$(DEMO_preProc_SOURCES) $(DEMO_ratemap_SOURCES)
 DIST_SOURCES = $(libmatFiles_a_SOURCES) \
 	$(DEMO_crossCorrelation_SOURCES) $(DEMO_filterbank_SOURCES) \
 	$(DEMO_ihc_SOURCES) $(DEMO_ild_SOURCES) $(DEMO_input_SOURCES) \
-	$(DEMO_itd_SOURCES) $(DEMO_preProc_SOURCES) \
-	$(DEMO_ratemap_SOURCES)
+	$(DEMO_preProc_SOURCES) $(DEMO_ratemap_SOURCES)
 am__can_run_installinfo = \
   case $$AM_UPDATE_INFO_DIR in \
     n|no|NO) false;; \
@@ -368,8 +362,6 @@ DEMO_ratemap_SOURCES = DEMO_ratemap.cpp
 DEMO_ratemap_LDADD = ../src/libopenAFE.la libmatFiles.a $(MATFILESLIB_LIBS)
 DEMO_crossCorrelation_SOURCES = DEMO_crossCorrelation.cpp
 DEMO_crossCorrelation_LDADD = ../src/libopenAFE.la libmatFiles.a $(MATFILESLIB_LIBS)
-DEMO_itd_SOURCES = DEMO_itd.cpp
-DEMO_itd_LDADD = ../src/libopenAFE.la libmatFiles.a $(MATFILESLIB_LIBS)
 all: all-am
 
 .SUFFIXES:
@@ -482,10 +474,6 @@ DEMO_input$(EXEEXT): $(DEMO_input_OBJECTS) $(DEMO_input_DEPENDENCIES) $(EXTRA_DE
 	@rm -f DEMO_input$(EXEEXT)
 	$(AM_V_CXXLD)$(CXXLINK) $(DEMO_input_OBJECTS) $(DEMO_input_LDADD) $(LIBS)
 
-DEMO_itd$(EXEEXT): $(DEMO_itd_OBJECTS) $(DEMO_itd_DEPENDENCIES) $(EXTRA_DEMO_itd_DEPENDENCIES) 
-	@rm -f DEMO_itd$(EXEEXT)
-	$(AM_V_CXXLD)$(CXXLINK) $(DEMO_itd_OBJECTS) $(DEMO_itd_LDADD) $(LIBS)
-
 DEMO_preProc$(EXEEXT): $(DEMO_preProc_OBJECTS) $(DEMO_preProc_DEPENDENCIES) $(EXTRA_DEMO_preProc_DEPENDENCIES) 
 	@rm -f DEMO_preProc$(EXEEXT)
 	$(AM_V_CXXLD)$(CXXLINK) $(DEMO_preProc_OBJECTS) $(DEMO_preProc_LDADD) $(LIBS)
@@ -505,7 +493,6 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/DEMO_ihc.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/DEMO_ild.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/DEMO_input.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/DEMO_itd.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/DEMO_preProc.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/DEMO_ratemap.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/matFiles.Po@am__quote@

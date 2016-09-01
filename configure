@@ -15565,7 +15565,7 @@ ac_compile='$CXX -c $CXXFLAGS $CPPFLAGS conftest.$ac_ext >&5'
 ac_link='$CXX -o conftest$ac_exeext $CXXFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $LIBS >&5'
 ac_compiler_gnu=$ac_cv_cxx_compiler_gnu
 
-CXXFLAGS='-Wall -Wsign-compare -std=c++11 -pthread -D_REENTRANT -DHAVE_INLINE'
+CXXFLAGS='-Wall -O3 -Wsign-compare -std=c++11 -pthread -D_REENTRANT -DHAVE_INLINE -funroll-loops -ftree-vectorize -ftree-vectorizer-verbose=0'
 
 
 if test "x${dont_install}" = "xno"; then

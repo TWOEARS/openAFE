@@ -1,6 +1,7 @@
 #include "preProc.hpp"
 
 using namespace openAFE;
+using namespace std;
 	
             void PreProc::verifyParameters() {
 				
@@ -15,8 +16,8 @@ using namespace openAFE;
 			
 					// 1- DC-removal filter
 					if ( this->pp_bRemoveDC ) {
-						std::thread leftThread1( &bwFilter::exec, this->dcFilter_l, firstValue_l, dim_l , firstValue_l );
-						std::thread rightThread1( &bwFilter::exec, this->dcFilter_r, firstValue_r, dim_r , firstValue_r );
+						thread leftThread1( &bwFilter::exec, this->dcFilter_l, firstValue_l, dim_l , firstValue_l );
+						thread rightThread1( &bwFilter::exec, this->dcFilter_r, firstValue_r, dim_r , firstValue_r );
 							
 						leftThread1.join();                // pauses until left finishes
 						rightThread1.join();               // pauses until right finishes
@@ -24,8 +25,8 @@ using namespace openAFE;
 
 					// 2- Pre-whitening
 					if ( this->pp_bPreEmphasis ) {
-						std::thread leftThread1( &GenericFilter<double,double, double, double>::exec, this->preEmphFilter_l, firstValue_l, dim_l , firstValue_l );
-						std::thread rightThread1( &GenericFilter<double,double, double, double>::exec, this->preEmphFilter_r, firstValue_r, dim_r , firstValue_r );
+						thread leftThread1( &GenericFilter<double,double, double, double>::exec, this->preEmphFilter_l, firstValue_l, dim_l , firstValue_l );
+						thread rightThread1( &GenericFilter<double,double, double, double>::exec, this->preEmphFilter_r, firstValue_r, dim_r , firstValue_r );
 							
 						leftThread1.join();                // pauses until left finishes
 						rightThread1.join();               // pauses until right finishes		
@@ -114,8 +115,7 @@ using namespace openAFE;
 					
 					if ( this->pp_bMiddleEarFiltering ) {
 						//	TODO 
-					}
-													
+					}	  	  		
 					// Processed data is on PMZ
 			}
 		

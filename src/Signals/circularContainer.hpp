@@ -31,6 +31,8 @@ namespace openAFE {
 		circularBuffer buffer;
 		
 		twoCTypeBlockPtr lastChunkInfo, lastDataInfo, oldDataInfo, wholeBufferInfo;
+		
+		boostArrayRange ar1, ar2;
 				
 		/*
 		 * freshData : Distance between the newest and the oldest - unseen data
@@ -38,16 +40,6 @@ namespace openAFE {
 		 * */
 		volatile std::size_t lastChunkSize;
 		volatile long int freshData;
-						
-		inline
-		void push_back(const T& val) {
-			this->buffer.push_back(val);
-		}
-		
-		inline
-		void pop_front() {
-			this->buffer.pop_front();
-		}
 		
 		/* getLastChunkSize : return the number of samples, appended by the last chunk */
 		inline
@@ -73,7 +65,143 @@ namespace openAFE {
 			else 
 				this->lastChunkSize = numSamples ;
 		}
-													
+
+		/* calcLastChunk : updates the lastChunkInfo */
+		inline
+		void calcLastChunk() {
+			
+			this->ar1 = buffer.array_one();
+			this->ar2 = buffer.array_two();
+			 
+			if ( ar2.second == 0 ) {	
+				this->lastChunkInfo->array1.first = ar1.first + ar1.second - this->getLastChunkSize();
+				this->lastChunkInfo->array1.second = this->getLastChunkSize();
+				this->lastChunkInfo->array2.first = NULL;
+				this->lastChunkInfo->array2.second = 0;
+			} else {
+				if ( this->getLastChunkSize() >= ar2.second ) {	
+					this->lastChunkInfo->array1.second = lastChunkSize - ar2.second;
+					this->lastChunkInfo->array1.first = ar1.first + ar1.second - this->lastChunkInfo->array1.second;
+					this->lastChunkInfo->array2.second  = ar2.second;
+					this->lastChunkInfo->array2.first = ar2.first;
+				} else /* if ( lastChunkSize <= ar2.second ) */ {
+					this->lastChunkInfo->array1.first = ar2.first + ar2.second - this->getLastChunkSize();
+					this->lastChunkInfo->array1.second = this->getLastChunkSize();
+
+					this->lastChunkInfo->array2.first = NULL;
+					this->lastChunkInfo->array2.second  = 0;
+					}
+				}		
+		}
+		
+		/* calcLatestData : updates the lastDataInfo 
+		 * 
+		 * Arguments : 
+		 * 	samplesArg : the amount asked data
+		 * 
+		 * */
+		inline
+		void calcLatestData(uint32_t samplesArg) {
+			
+			this->ar1 = buffer.array_one();
+			this->ar2 = buffer.array_two();
+			
+			if ( samplesArg > buffer.size() ) {
+				samplesArg = buffer.size();	
+			}
+				
+			if ( ar2.second == 0 ) {
+				this->lastDataInfo->array1.first = ar1.first + ar1.second - samplesArg;
+				this->lastDataInfo->array1.second = samplesArg;
+				this->lastDataInfo->array2.first = NULL;
+				this->lastDataInfo->array2.second = 0;
+			} else if ( samplesArg >= ar2.second ) {
+				this->lastDataInfo->array1.second = samplesArg - ar2.second;
+				this->lastDataInfo->array1.first = ar1.first + ar1.second - this->lastDataInfo->array1.second;
+				this->lastDataInfo->array2.second  = ar2.second;
+				this->lastDataInfo->array2.first = ar2.first;
+			} else /* if ( samplesArg <= ar2.second ) */ {
+				this->lastDataInfo->array1.first = ar2.first + ar2.second - samplesArg;
+				this->lastDataInfo->array1.second = samplesArg;
+
+				this->lastDataInfo->array2.first = NULL;
+				this->lastDataInfo->array2.second = 0;
+				}
+		}
+
+		/* calcOldData : updates the oldDataInfo 
+		 * 
+		 * Arguments : 
+		 * 	samplesArg : the amount asked data
+		 *  setNow : if true, the fresh data is updated automatically.
+		 * 	set false if you need to acces to the same oldDataInfo
+		 *  mutiple times.
+		 * 
+		 * */
+		inline 
+		void calcOldData(uint32_t samplesArg) {
+			
+			this->ar1 = buffer.array_one();
+			this->ar2 = buffer.array_two();
+			
+			if ( samplesArg > buffer.size() ) {
+				samplesArg = buffer.size();	
+			}
+			
+			if ( ( samplesArg > freshData ) || ( samplesArg == 0 ) ) {
+				samplesArg = freshData;	
+			}
+						
+			/* Eveything is in ar1 */
+			if ( ar2.second == 0 ) {
+				this->oldDataInfo->array1.first = ar1.first + ar1.second - freshData;
+				this->oldDataInfo->array1.second = samplesArg;
+				this->oldDataInfo->array2.first = NULL;
+				this->oldDataInfo->array2.second = 0;
+			       /* It is in ar1 ( but ar2 exists ) */
+			} else if ( ar2.second < freshData ) { 
+					if ( ( freshData - samplesArg ) > ar2.second) {
+						this->oldDataInfo->array1.first = ar1.first + ar1.second + ar2.second - freshData;
+						this->oldDataInfo->array1.second = samplesArg;
+						this->oldDataInfo->array2.first = NULL;
+						this->oldDataInfo->array2.second = 0;	
+					/* It is in ar1 and  ar2 */	
+					} else {
+						this->oldDataInfo->array1.first = ar1.first + ar1.second + ar2.second - freshData;
+						this->oldDataInfo->array1.second = freshData - ar2.second;
+						this->oldDataInfo->array2.first = ar2.first;
+						this->oldDataInfo->array2.second = samplesArg - freshData + ar2.second ;	
+					}
+			/* Eveything is in ar2 */
+			} else {
+				this->oldDataInfo->array1.first = ar2.first + ar2.second - freshData;
+				this->oldDataInfo->array1.second = samplesArg;
+				this->oldDataInfo->array2.first = NULL;
+				this->oldDataInfo->array2.second = 0;	
+			}
+			
+			this->freshData -= samplesArg;
+			if ( this->freshData < 0 )
+				this->freshData = 0;
+
+		}
+
+		/* calcWholeBuffer : updates the wholeBufferInfo */
+		inline
+		void calcWholeBuffer() {
+			
+			this->ar1 = buffer.array_one();
+			this->ar2 = buffer.array_two();
+
+			this->wholeBufferInfo->array1.first = ar1.first;
+			this->wholeBufferInfo->array1.second = ar1.second;
+			if ( ar2.second > 0 )
+				this->wholeBufferInfo->array2.first = ar2.first;
+			else 
+				this->wholeBufferInfo->array2.first = NULL;
+			this->wholeBufferInfo->array2.second = ar2.second;
+		}
+															
 	public :		
 		
 		/* Empty ctor. The buffer's capacity is zero. */
@@ -125,33 +253,33 @@ namespace openAFE {
 		 * signle c type vector, then setNow = true
 		 *
 		 * */
-		void push_chunk(T* firstValue, std::size_t dim, bool setNow = true) {							
+		void push_chunk(const T* firstValue, std::size_t dim, bool setNow = true) {							
 
 			if ( setNow == true )
 				this->setLastChunkSize (dim);
 				
 			// Pushing back all values one by one.
 			for ( std::size_t i = 0 ; i < dim ; ++i )
-				this->push_back( *(firstValue + i) );
+				this->buffer.push_back(*(firstValue + i));
 			
 			freshData += dim;
 			if ( freshData > this->getCapacity() )
 				freshData = this->getCapacity();
 		}
 
-		void pop_chunk( std::size_t dim ) {
+		void pop_chunk( const std::size_t dim ) {
 			std::size_t tmp = dim;
 			if ( dim > buffer.size() )
 				tmp = buffer.size();
 			for (unsigned int i = 0 ; i < tmp ; ++i )
-				this->pop_front();
+				this->buffer.pop_front();
 		}
 		
-		void push_chunk(twoCTypeBlockPtr inChunk) {	
+		void push_chunk(const twoCTypeBlockPtr inChunk) {	
 			
 			/* The first array */
-			if ( inChunk->array1.second > 0 )
-				this->push_chunk( inChunk->array1.first, inChunk->array1.second, false );
+			this->push_chunk( inChunk->array1.first, inChunk->array1.second, false );
+			
 			/* If there is any data, the second array */
 			if ( inChunk->array2.second > 0 )
 				this->push_chunk( inChunk->array2.first, inChunk->array2.second, false );
@@ -165,152 +293,25 @@ namespace openAFE {
 		}
 		
 		twoCTypeBlockPtr getLastChunkAccesor() {
+			this->calcLastChunk();
 			return this->lastChunkInfo;		
 		}
 		
-		twoCTypeBlockPtr getLastDataAccesor() {
+		twoCTypeBlockPtr getLastDataAccesor(const uint32_t samplesArg) {
+			this->calcLatestData(samplesArg);
 			return this->lastDataInfo;
 		}
 
-		twoCTypeBlockPtr getOldDataAccesor() {
+		twoCTypeBlockPtr getOldDataAccesor(uint32_t samplesArg = 0) {
+			this->calcOldData(samplesArg);
 			return this->oldDataInfo;
 		}
 
 		twoCTypeBlockPtr getWholeBufferAccesor() {
+			this->calcWholeBuffer();
 			return this->wholeBufferInfo;
 		}
 		
-		/* calcLastChunk : updates the lastChunkInfo */
-		void calcLastChunk() {
-			
-			boostArrayRange ar1 = buffer.array_one();
-			boostArrayRange ar2 = buffer.array_two();
-			 
-			if ( ar2.second == 0 ) {	
-				this->lastChunkInfo->array1.first = ar1.first + ar1.second - this->getLastChunkSize();
-				this->lastChunkInfo->array1.second = this->getLastChunkSize();
-				this->lastChunkInfo->array2.first = NULL;
-				this->lastChunkInfo->array2.second = 0;
-			} else {
-				if ( this->getLastChunkSize() >= ar2.second ) {	
-					this->lastChunkInfo->array1.second = lastChunkSize - ar2.second;
-					this->lastChunkInfo->array1.first = ar1.first + ar1.second - this->lastChunkInfo->array1.second;
-					this->lastChunkInfo->array2.second  = ar2.second;
-					this->lastChunkInfo->array2.first = ar2.first;
-				} else /* if ( lastChunkSize <= ar2.second ) */ {
-					this->lastChunkInfo->array1.first = ar2.first + ar2.second - this->getLastChunkSize();
-					this->lastChunkInfo->array1.second = this->getLastChunkSize();
-
-					this->lastChunkInfo->array2.first = NULL;
-					this->lastChunkInfo->array2.second  = 0;
-					}
-				}		
-		}
-		
-		/* calcLatestData : updates the lastDataInfo 
-		 * 
-		 * Arguments : 
-		 * 	samplesArg : the amount asked data
-		 * 
-		 * */
-		void calcLatestData(uint32_t samplesArg) {
-			boostArrayRange ar1 = buffer.array_one();
-			boostArrayRange ar2 = buffer.array_two();
-			
-			if ( samplesArg > buffer.size() ) {
-				samplesArg = buffer.size();	
-			}
-				
-			if ( ar2.second == 0 ) {
-				this->lastDataInfo->array1.first = ar1.first + ar1.second - samplesArg;
-				this->lastDataInfo->array1.second = samplesArg;
-				this->lastDataInfo->array2.first = NULL;
-				this->lastDataInfo->array2.second = 0;
-			} else if ( samplesArg >= ar2.second ) {
-				this->lastDataInfo->array1.second = samplesArg - ar2.second;
-				this->lastDataInfo->array1.first = ar1.first + ar1.second - this->lastDataInfo->array1.second;
-				this->lastDataInfo->array2.second  = ar2.second;
-				this->lastDataInfo->array2.first = ar2.first;
-			} else /* if ( samplesArg <= ar2.second ) */ {
-				this->lastDataInfo->array1.first = ar2.first + ar2.second - samplesArg;
-				this->lastDataInfo->array1.second = samplesArg;
-
-				this->lastDataInfo->array2.first = NULL;
-				this->lastDataInfo->array2.second = 0;
-				}
-		}
-
-		/* calcOldData : updates the oldDataInfo 
-		 * 
-		 * Arguments : 
-		 * 	samplesArg : the amount asked data
-		 *  setNow : if true, the fresh data is updated automatically.
-		 * 	set false if you need to acces to the same oldDataInfo
-		 *  mutiple times.
-		 * 
-		 * */
-		void calcOldData(uint32_t samplesArg = 0) {
-			
-			boostArrayRange ar1 = buffer.array_one();
-			boostArrayRange ar2 = buffer.array_two();
-			
-			if ( samplesArg > buffer.size() ) {
-				samplesArg = buffer.size();	
-			}
-			
-			if ( ( samplesArg > freshData ) || ( samplesArg == 0 ) ) {
-				samplesArg = freshData;	
-			}
-						
-			/* Eveything is in ar1 */
-			if ( ar2.second == 0 ) {
-				this->oldDataInfo->array1.first = ar1.first + ar1.second - freshData;
-				this->oldDataInfo->array1.second = samplesArg;
-				this->oldDataInfo->array2.first = NULL;
-				this->oldDataInfo->array2.second = 0;
-			       /* It is in ar1 ( but ar2 exists ) */
-			} else if ( ar2.second < freshData ) { 
-					if ( ( freshData - samplesArg ) > ar2.second) {
-						this->oldDataInfo->array1.first = ar1.first + ar1.second + ar2.second - freshData;
-						this->oldDataInfo->array1.second = samplesArg;
-						this->oldDataInfo->array2.first = NULL;
-						this->oldDataInfo->array2.second = 0;	
-					/* It is in ar1 and  ar2 */	
-					} else {
-						this->oldDataInfo->array1.first = ar1.first + ar1.second + ar2.second - freshData;
-						this->oldDataInfo->array1.second = freshData - ar2.second;
-						this->oldDataInfo->array2.first = ar2.first;
-						this->oldDataInfo->array2.second = samplesArg - freshData + ar2.second ;	
-					}
-			/* Eveything is in ar2 */
-			} else {
-				this->oldDataInfo->array1.first = ar2.first + ar2.second - freshData;
-				this->oldDataInfo->array1.second = samplesArg;
-				this->oldDataInfo->array2.first = NULL;
-				this->oldDataInfo->array2.second = 0;	
-			}
-			
-			this->freshData -= samplesArg;
-			if ( this->freshData < 0 )
-				this->freshData = 0;
-
-		}
-
-		/* calcWholeBuffer : updates the wholeBufferInfo */
-		void calcWholeBuffer() {
-			
-			boostArrayRange ar1 = buffer.array_one();
-			boostArrayRange ar2 = buffer.array_two();
-
-			this->wholeBufferInfo->array1.first = ar1.first;
-			this->wholeBufferInfo->array1.second = ar1.second;
-			if ( ar2.second > 0 )
-				this->wholeBufferInfo->array2.first = ar2.first;
-			else 
-				this->wholeBufferInfo->array2.first = NULL;
-			this->wholeBufferInfo->array2.second = ar2.second;
-		}
-
 		/* getFreshDataSize : Returns the number of available non seen samples */
 		uint32_t getFreshDataSize() {
 			return this->freshData;
@@ -327,7 +328,6 @@ namespace openAFE {
 		
 		/* capacity will be zero after calling the clear function */
 		void clear() noexcept {
-			
 			this->buffer.clear();
 		}
 		

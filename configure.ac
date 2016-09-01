@@ -25,7 +25,7 @@ fi
 
 LT_INIT
 AC_PROG_CPP
-CXXFLAGS='-Wall -Wsign-compare -std=c++11 -pthread -D_REENTRANT -DHAVE_INLINE'
+CXXFLAGS='-Wall -O3 -Wsign-compare -std=c++11 -pthread -D_REENTRANT -DHAVE_INLINE -funroll-loops -ftree-vectorize -ftree-vectorizer-verbose=0'
 AC_SUBST([CC])
 
 if test "x${dont_install}" = "xno"; then

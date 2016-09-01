@@ -52,34 +52,36 @@ namespace openAFE {
 				rightPMZ->reset();
 			}					
 
-			std::vector<std::shared_ptr<twoCTypeBlock<T> > > getLeftLastChunkAccessor() { 
+			inline
+			std::vector<std::shared_ptr<twoCTypeBlock<T> > >& getLeftLastChunkAccessor() { 
 				return this->leftOutput->getLastChunkAccesor();
 			}
 
-			std::vector<std::shared_ptr<twoCTypeBlock<T> > > getRightLastChunkAccessor() {
+		    inline
+			std::vector<std::shared_ptr<twoCTypeBlock<T> > >& getRightLastChunkAccessor() {
 				return this->rightOutput->getLastChunkAccesor();
 			}
 
-			std::vector<std::shared_ptr<twoCTypeBlock<T> > > getLeftWholeBufferAccessor() {
+			std::vector<std::shared_ptr<twoCTypeBlock<T> > >& getLeftWholeBufferAccessor() {
 				return this->leftOutput->getWholeBufferAccesor();
 			}
 
-			std::vector<std::shared_ptr<twoCTypeBlock<T> > > getRightWholeBufferAccessor() {
+			std::vector<std::shared_ptr<twoCTypeBlock<T> > >& getRightWholeBufferAccessor() {
 				return this->rightOutput->getWholeBufferAccesor();
 			}
 
-			std::vector<std::shared_ptr<twoCTypeBlock<T> > > getLeftOldDataAccessor() {
+			std::vector<std::shared_ptr<twoCTypeBlock<T> > >& getLeftOldDataAccessor() {
 				return this->leftOutput->getOldDataAccesor();
 			}
 
-			std::vector<std::shared_ptr<twoCTypeBlock<T> > > getRightOldDataAccessor() {
+			std::vector<std::shared_ptr<twoCTypeBlock<T> > >& getRightOldDataAccessor() {
 				return this->rightOutput->getOldDataAccesor();
 			}
 			
 			void releaseChunk () {
 				if ( this->hasTwoOutputs ) {						
-					std::thread leftAppendThread( &TimeFrequencySignal<T>::appendChunk, this->leftOutput, this->leftPMZ->getLastChunkAccesor() );
-					std::thread rightAppendThread( &TimeFrequencySignal<T>::appendChunk, this->rightOutput, this->rightPMZ->getLastChunkAccesor() );
+					std::thread leftAppendThread( &TimeFrequencySignal<T>::appendChunk, this->leftOutput, std::ref(this->leftPMZ->getLastChunkAccesor()) );
+					std::thread rightAppendThread( &TimeFrequencySignal<T>::appendChunk, this->rightOutput, std::ref(this->rightPMZ->getLastChunkAccesor()) );
 						
 					leftAppendThread.join();                // pauses until left finishes
 					rightAppendThread.join();               // pauses until right finishes

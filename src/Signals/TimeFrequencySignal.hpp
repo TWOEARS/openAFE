@@ -75,14 +75,14 @@ namespace openAFE {
 				buffer[ii]->push_chunk( inChunk );
 		}
 		
-		void appendChunk( std::vector<std::shared_ptr<twoCTypeBlock<T> > > inChunk ) {
+		void appendChunk( const std::vector<std::shared_ptr<twoCTypeBlock<T> > >& inChunk ) {
 			for ( std::size_t ii = 0 ; ii < this->nChannel ; ++ii )
 				buffer[ii]->push_chunk( inChunk[ii] );
 		}
 		
+		inline
 		std::vector<std::shared_ptr<twoCTypeBlock<T> > >& getLastChunkAccesor() {
 			for ( std::size_t ii = 0 ; ii < this->nChannel ; ++ii ) {
-				this->buffer[ii]->calcLastChunk();
 				this->lastChunkInfo[ii]->setData( this->buffer[ii]->getLastChunkAccesor() );
 			}
 			return this->lastChunkInfo;
@@ -90,7 +90,6 @@ namespace openAFE {
 		
 		std::vector<std::shared_ptr<twoCTypeBlock<T> > >& getWholeBufferAccesor() {
 			for ( std::size_t ii = 0 ; ii < this->nChannel ; ++ii ) {
-				this->buffer[ii]->calcWholeBuffer();
 				this->wholeBufferInfo[ii]->setData( this->buffer[ii]->getWholeBufferAccesor() );
 			}
 			return this->wholeBufferInfo;
@@ -98,7 +97,6 @@ namespace openAFE {
 
 		std::vector<std::shared_ptr<twoCTypeBlock<T> > >& getOldDataAccesor() {
 			for ( std::size_t ii = 0 ; ii < this->nChannel ; ++ii ) {
-				this->buffer[ii]->calcOldData();
 				this->oldDataInfo[ii]->setData( this->buffer[ii]->getOldDataAccesor() );
 			}
 			return this->oldDataInfo;

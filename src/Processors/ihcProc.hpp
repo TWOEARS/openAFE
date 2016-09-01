@@ -1,5 +1,7 @@
 #ifndef IHCPROC_HPP
 #define IHCPROC_HPP
+
+#include <memory>
 	
 #include "TFSProcessor.hpp"
 #include "gammatoneProc.hpp"
@@ -42,12 +44,18 @@ namespace openAFE {
 			uint32_t fb_nChannels;
 
 			void populateFilters( filterPtrVector& filters );
+			
+			inline
+			void processHalfWave ( size_t& dim1_l, size_t& dim2_l, double* firstValue1_l, double* firstValue2_l, size_t& dim1_r, size_t& dim2_r, double* firstValue1_r, double* firstValue2_r );
 
-			void processFilteringChannel ( bwFilterPtr filter, std::shared_ptr<twoCTypeBlock<double> > oneChannel );
-			
-			void processChannel ( std::shared_ptr<twoCTypeBlock<double> > oneChannel );
-			
-			void processLR ( filterPtrVector& filters, std::vector<std::shared_ptr<twoCTypeBlock<double> > > PMZ );
+			inline
+			void processFullWave ( size_t& dim1_l, size_t& dim2_l, double* firstValue1_l, double* firstValue2_l, size_t& dim1_r, size_t& dim2_r, double* firstValue1_r, double* firstValue2_r );
+
+			inline
+			void processSquare ( size_t& dim1_l, size_t& dim2_l, double* firstValue1_l, double* firstValue2_l, size_t& dim1_r, size_t& dim2_r, double* firstValue1_r, double* firstValue2_r );
+						
+			inline
+			void processDAU ( size_t& dim1_l, size_t& dim2_l, double* firstValue1_l, double* firstValue2_l, bwFilterPtr filter_l, size_t& dim1_r, size_t& dim2_r, double* firstValue1_r, double* firstValue2_r, bwFilterPtr filter_r );
 
 		public:
 																		

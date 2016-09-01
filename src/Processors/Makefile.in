@@ -102,8 +102,7 @@ libprocessors_a_LIBADD =
 am_libprocessors_a_OBJECTS = Processor.$(OBJEXT) inputProc.$(OBJEXT) \
 	preProc.$(OBJEXT) gammatoneProc.$(OBJEXT) ihcProc.$(OBJEXT) \
 	windowBasedProcs.$(OBJEXT) ildProc.$(OBJEXT) ratemap.$(OBJEXT) \
-	windowBasedLAGProcs.$(OBJEXT) crossCorrelation.$(OBJEXT) \
-	itdProc.$(OBJEXT)
+	windowBasedLAGProcs.$(OBJEXT) crossCorrelation.$(OBJEXT)
 libprocessors_a_OBJECTS = $(am_libprocessors_a_OBJECTS)
 AM_V_P = $(am__v_P_@AM_V@)
 am__v_P_ = $(am__v_P_@AM_DEFAULT_V@)
@@ -315,7 +314,7 @@ libprocessors_a_SOURCES = Processor.hpp Processor.cpp TDSProcessor.hpp \
 	windowBasedProcs.cpp ildProc.hpp ildProc.cpp ratemap.hpp \
 	ratemap.cpp LAGProcessor.hpp windowBasedLAGProcs.hpp \
 	windowBasedLAGProcs.cpp crossCorrelation.hpp \
-	crossCorrelation.cpp itdProc.hpp itdProc.cpp
+	crossCorrelation.cpp
 all: all-am
 
 .SUFFIXES:
@@ -371,7 +370,6 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/ihcProc.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/ildProc.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/inputProc.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/itdProc.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/preProc.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/ratemap.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/windowBasedLAGProcs.Po@am__quote@

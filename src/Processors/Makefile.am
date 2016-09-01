@@ -24,5 +24,3 @@ libprocessors_a_SOURCES += windowBasedLAGProcs.hpp
 libprocessors_a_SOURCES += windowBasedLAGProcs.cpp
 libprocessors_a_SOURCES += crossCorrelation.hpp
 libprocessors_a_SOURCES += crossCorrelation.cpp
-libprocessors_a_SOURCES += itdProc.hpp
-libprocessors_a_SOURCES += itdProc.cpp
