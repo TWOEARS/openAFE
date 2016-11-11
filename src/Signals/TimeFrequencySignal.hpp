@@ -74,6 +74,15 @@ namespace openAFE {
 			for ( std::size_t ii = 0 ; ii < this->nChannel ; ++ii )
 				buffer[ii]->push_chunk( inChunk );
 		}
+
+		inline
+		void appendFrameToChannel( const size_t ii, const T* inFrame ) {
+				buffer[ii]->push_frame( inFrame );
+		}
+
+		void setLastChunkSize( const unsigned int ii, size_t lastChunkSize ) {
+				buffer[ii]->setLastChunkSize( lastChunkSize );
+		}
 		
 		void appendChunk( const std::vector<std::shared_ptr<twoCTypeBlock<T> > >& inChunk ) {
 			for ( std::size_t ii = 0 ; ii < this->nChannel ; ++ii )

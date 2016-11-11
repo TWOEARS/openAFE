@@ -54,18 +54,6 @@ namespace openAFE {
 			return this->buffer.capacity();
 		}
 
-		/* Update the sample number of the lately pushed chunk.
-		 * Call this funtion if the argument "setNow" of push_chunk
-		 * function is false.
-		 * */
-		void setLastChunkSize( uint32_t numSamples ) { // if referenced, then error in l 124 : this->setLastChunkSize ( 0 );
-			
-			if (numSamples > this->getCapacity() )
-				this->lastChunkSize = this->getCapacity();
-			else 
-				this->lastChunkSize = numSamples ;
-		}
-
 		/* calcLastChunk : updates the lastChunkInfo */
 		inline
 		void calcLastChunk() {
@@ -243,6 +231,18 @@ namespace openAFE {
 			this->buffer = toCopy.buffer;		// verified : copys to another memory zone
 		}
 
+		/* Update the sample number of the lately pushed chunk.
+		 * Call this funtion if the argument "setNow" of push_chunk
+		 * function is false.
+		 * */
+		void setLastChunkSize( uint32_t numSamples ) { // if referenced, then error in l 124 : this->setLastChunkSize ( 0 );
+			
+			if (numSamples > this->getCapacity() )
+				this->lastChunkSize = this->getCapacity();
+			else 
+				this->lastChunkSize = numSamples ;
+		}
+		
 		/* Push to the back of the buffer a continuous c type vector
 		 * 
 		 * bool setNow : a signle chunk may be contained in two distinct
@@ -263,6 +263,14 @@ namespace openAFE {
 				this->buffer.push_back(*(firstValue + i));
 			
 			freshData += dim;
+			if ( freshData > this->getCapacity() )
+				freshData = this->getCapacity();
+		}
+
+		void push_frame(const T* frame) {								
+			this->buffer.push_back( *frame );
+			
+			freshData += 1;
 			if ( freshData > this->getCapacity() )
 				freshData = this->getCapacity();
 		}

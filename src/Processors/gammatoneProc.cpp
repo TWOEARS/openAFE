@@ -75,35 +75,38 @@ using namespace std;
 				}
 			}
 
-			void GammatoneProc::processChannel ( gammatoneFilterPtr oneFilter, shared_ptr<twoCTypeBlock<double> > oneChannel ) {
+			void GammatoneProc::processChannel ( gammatoneFilterPtr oneFilter, shared_ptr<TimeFrequencySignal<double> > dest, size_t ii, shared_ptr<twoCTypeBlock<double> > oneChannel ) {
 				// 0- Initialization
 				size_t dim1 = oneChannel->array1.second;
 				size_t dim2 = oneChannel->array2.second;
-							
-				double* firstValue1 = oneChannel->array1.first;
-				double* firstValue2 = oneChannel->array2.first;
 				
-				vector< complex<double > > tmpComplex;
+				complex<double > complexValue;
+				double value;
 				if ( dim1 > 0 ) {
-					tmpComplex.resize(dim1, 0);
-					oneFilter->exec( firstValue1, dim1, tmpComplex.data() );
-														
-					for ( size_t ii = 0 ; ii < dim1 ; ++ii )
-						*( firstValue1 + ii ) = tmpComplex[ii].real() * 2;
+					double* firstValue1 = oneChannel->array1.first;
+					for ( size_t iii = 0 ; iii < dim1 ; ++iii ) {
+						oneFilter->execFrame( firstValue1 + iii, &complexValue );
+						value = complexValue.real() * 2;
+						dest->appendFrameToChannel( ii, &value );
+					}
 				}
 				if ( dim2 > 0 )	{
-					tmpComplex.resize(dim2, 0);
-					oneFilter->exec( firstValue2, dim2, tmpComplex.data() );
-					for ( size_t ii = 0 ; ii < dim2 ; ++ii )
-						*( firstValue2 + ii ) = tmpComplex[ii].real() * 2;	
+					double* firstValue2 = oneChannel->array2.first;
+					for ( size_t iii = 0 ; iii < dim2 ; ++iii ) {
+						oneFilter->execFrame( firstValue2 + iii, &complexValue );
+						value = complexValue.real() * 2;
+						dest->appendFrameToChannel( ii, &value );
+					}
 				}
 
+				dest->setLastChunkSize( ii, dim1 + dim2 );
 			}
 
-			void GammatoneProc::processLR ( filterPtrVector& filters, vector<shared_ptr<twoCTypeBlock<double> > > PMZ ) {
+			inline
+			void GammatoneProc::processLR ( filterPtrVector& filters, shared_ptr<TimeFrequencySignal<double> > dest, shared_ptr<twoCTypeBlock<double> > source ) {
 				vector<thread> threads;
 				  for ( size_t ii = 0 ; ii < this->cfHz.size() ; ++ii )
-					threads.push_back(thread( &GammatoneProc::processChannel, this, filters[ii], PMZ[ii] ));
+					threads.push_back(thread( &GammatoneProc::processChannel, this, filters[ii], dest, ii, source ));
 
 				  // Waiting to join the threads
 				  for (auto& t : threads)
@@ -137,20 +140,14 @@ using namespace std;
 				this->setNFR ( this->upperProcPtr->getNFR() );
 				
 				// Appending the chunk to process (the processing must be done on the PMZ)
-				leftPMZ->appendNChunk( this->upperProcPtr->getLeftLastChunkAccessor() );
-				rightPMZ->appendNChunk( this->upperProcPtr->getRightLastChunkAccessor() );
-				
-				vector<shared_ptr<twoCTypeBlock<double> > > l_PMZ = leftPMZ->getLastChunkAccesor();
-				vector<shared_ptr<twoCTypeBlock<double> > > r_PMZ = rightPMZ->getLastChunkAccesor();
-				/*
-				thread leftThread( &GammatoneProc::processLR, this, ref(this->leftFilters), l_PMZ );
-				thread rightThread( &GammatoneProc::processLR, this, ref(this->rightFilters), r_PMZ );
+/*				thread leftThread( &GammatoneProc::processLR, this, ref(this->leftFilters), leftPMZ, this->upperProcPtr->getLeftLastChunkAccessor());
+				thread rightThread( &GammatoneProc::processLR, this, ref(this->rightFilters), rightPMZ, this->upperProcPtr->getRightLastChunkAccessor());
 							
 				leftThread.join();                // pauses until left finishes
 				rightThread.join();               // pauses until right finishes
-				*/
-				this->processLR( this->leftFilters, l_PMZ);
-				this->processLR( this->rightFilters, r_PMZ);	 
+*/				
+				this->processLR( this->leftFilters, leftPMZ, this->upperProcPtr->getLeftLastChunkAccessor());
+				this->processLR( this->rightFilters, rightPMZ, this->upperProcPtr->getRightLastChunkAccessor());		 
 			}
 			
 			void GammatoneProc::prepareForProcessing () {

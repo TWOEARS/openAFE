@@ -72,6 +72,7 @@ namespace openAFE {
 
 		// a(1)*y(n) = b(1)*x(n) + b(2)*x(n-1) + ... + b(nb+1)*x(n-nb)
         //             - a(2)*y(n-1) - ... - a(na+1)*y(n-na)
+        inline
 		void exec ( const T_in* srcStart, const std::size_t lenSrc, T_out* destStart ) {
 			if ( this->order > 0 ) {
 				
@@ -92,6 +93,11 @@ namespace openAFE {
 					states[ jj ] = exVar * this->vectB[ jj+1 ] - exVarDst * this->vectA[ jj + 1 ];
 				}
 			} else throw std::string("Filters order is zero.");
+		}
+
+		inline
+		virtual void execFrame( T_in* src, T_out* dst ) {
+			this->exec ( src, 1, dst );
 		}
 
 		void reset () {
