@@ -46,9 +46,8 @@ namespace openAFE {
 			
 			void populateFilters( filterPtrVector& filters );
 
-			void processChannel ( gammatoneFilterPtr oneFilter, std::shared_ptr<TimeFrequencySignal<double> > dest, std::size_t ii, std::shared_ptr<twoCTypeBlock<double> > oneChannel );
 
-			void processLR ( filterPtrVector& filters, std::shared_ptr <TimeFrequencySignal<double> > PMZ, std::shared_ptr<twoCTypeBlock<double> > inputVector );
+			void processChannel ( const std::size_t ii, const std::shared_ptr<twoCTypeBlock<double> > leftChannel, const std::shared_ptr<twoCTypeBlock<double> > rightChannel );
 														
 		public:
 		
