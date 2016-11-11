@@ -32,6 +32,16 @@ namespace openAFE {
 		~CascadeFilters() {
 			filterVector.clear();
 		}
+
+		inline
+		T_out execFrame( T_in* srcStart ) {
+			T_out destFrame;
+			
+			filterVector[0]->exec(srcStart, 1, &destFrame);
+			for ( std::size_t ii = 1 ; ii < cascadeOrder ; ++ii )
+				filterVector[ii]->exec( &destFrame, 1, &destFrame);
+			return destFrame;
+		}
 		
 		void exec( T_in* srcStart, const std::size_t lenSrc, T_out* destStart ) {
 			if( cascadeOrder != filterVector.size() )
@@ -40,7 +50,9 @@ namespace openAFE {
 				for ( std::size_t ii = 0 ; ii < cascadeOrder ; ++ii )
 					filterVector[ii]->exec(srcStart, lenSrc, srcStart);
 			} else {
-				// TMP vector here
+				filterVector[0]->exec(srcStart, lenSrc, destStart);
+				for ( std::size_t ii = 1 ; ii < cascadeOrder ; ++ii )
+					filterVector[ii]->exec( destStart, lenSrc, destStart);		
 			}
 		}
 		
