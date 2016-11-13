@@ -64,8 +64,8 @@ namespace openAFE {
 																					 bwFilterPtr filter_r );
 																					 
 			void processChannel ( const std::size_t ii,
-									  const std::vector<std::shared_ptr<twoCTypeBlock<double> > >& leftChannel,
-									  const std::vector<std::shared_ptr<twoCTypeBlock<double> > >& rightChannel );
+									  const std::shared_ptr<twoCTypeBlock<double> > leftChannel,
+									  const std::shared_ptr<twoCTypeBlock<double> > rightChannel );
 
 		public:
 																		

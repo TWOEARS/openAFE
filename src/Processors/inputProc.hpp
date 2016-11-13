@@ -29,7 +29,7 @@ namespace openAFE {
 			bool in_doNormalize;
 			uint64_t in_normalizeValue;
 									
-			void process ( double* firstValue, std::size_t dim );
+			void process ( double* firstValue, std::size_t dim, std::shared_ptr <TimeDomainSignal<double> > PMZ );
 
 		public:
 

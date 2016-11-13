@@ -1,5 +1,7 @@
 #include "preProc.hpp"
 
+#define EPSILON_PP 1E-8
+
 using namespace openAFE;
 using namespace std;
 	
@@ -12,113 +14,72 @@ using namespace std;
 			}
 						
 			// Actual Processing
-			void PreProc::process ( double* firstValue_l, std::size_t dim_l, double* firstValue_r, std::size_t dim_r ) {
-			
-					// 1- DC-removal filter
+			void PreProc::process ( size_t dim1, double* firstValue1, size_t dim2, double* firstValue2, shared_ptr <TimeDomainSignal<double> > PMZ ,
+																										bwFilterPtr dcFilter,
+																										genericFilterPtr preEmphFilter,
+																										genericFilterPtr agcFilter,
+																										double* tmp ) {
+				double value;
+				double dbVar = pow( 10 , ( 100 /* current_dboffset : dbspl(1) = 100 */ - this->pp_refSPLdB ) / 20 );
+				
+				for ( uint32_t i = 0 ; i < dim1 ; ++i ) {
+					// 1- DC Filter
 					if ( this->pp_bRemoveDC ) {
-						thread leftThread1( &bwFilter::exec, this->dcFilter_l, firstValue_l, dim_l , firstValue_l );
-						thread rightThread1( &bwFilter::exec, this->dcFilter_r, firstValue_r, dim_r , firstValue_r );
-							
-						leftThread1.join();                // pauses until left finishes
-						rightThread1.join();               // pauses until right finishes
-					}
-
-					// 2- Pre-whitening
-					if ( this->pp_bPreEmphasis ) {
-						thread leftThread1( &GenericFilter<double,double, double, double>::exec, this->preEmphFilter_l, firstValue_l, dim_l , firstValue_l );
-						thread rightThread1( &GenericFilter<double,double, double, double>::exec, this->preEmphFilter_r, firstValue_r, dim_r , firstValue_r );
-							
-						leftThread1.join();                // pauses until left finishes
-						rightThread1.join();               // pauses until right finishes		
-					}
-
-					// 3- Automatic gain control	
-					if ( this->pp_bNormalizeRMS ) {
-
-						// Initialize the filter states if empty
-						if ( !( agcFilter_l->isInitialized() ) ) {
-
-							double intArg = this->pp_intTimeSecRMS * this->getFsIn();
-							double sum_l = 0, sum_r = 0, s0_l, s0_r;
-							uint32_t minVal_l, minVal_r;
-							
-							minVal_l = fmin ( dim_l, round( intArg ) );
-							minVal_r = fmin ( dim_r, round( intArg ) );
-
-							// Mean square of input over the time constant
-							for ( unsigned int i = 0 ; i < minVal_l ; ++i ) {
-								sum_l += pow( *(firstValue_l + i ) , 2);
-								sum_r += pow( *(firstValue_r + i ) , 2);
-							}
-								
-							// Initial filter states
-							s0_l = exp ( -1 / intArg ) * ( sum_l / minVal_l );							
-							s0_r = exp ( -1 / intArg ) * ( sum_r / minVal_r );
-							
-							this->agcFilter_l->reset( &s0_l, 1 );
-							this->agcFilter_r->reset( &s0_r, 1 );
-						}
-						
-						// Estimate normalization constants
-						std::vector<double> tmp_l ( dim_l ), tmp_r ( dim_r );
-						for ( unsigned int i = 0 ; i < dim_l ; ++i ) {
-							tmp_l[ i ] = pow(*( firstValue_l + i ), 2);
-							tmp_r[ i ] = pow(*( firstValue_r + i ), 2);
-						}
-						
-						double normFactor;
-						
-						std::thread leftThread1( &GenericFilter<double,double, double, double>::exec, this->agcFilter_l, tmp_l.data(), dim_l , tmp_l.data() );
-						std::thread rightThread1( &GenericFilter<double,double, double, double>::exec, this->agcFilter_r, tmp_r.data(), dim_r , tmp_r.data() );
-							
-						leftThread1.join();                // pauses until left finishes
-						rightThread1.join();               // pauses until right finishes
-						
-						for ( unsigned int i = 0 ; i < dim_l ; ++i ) {
-							tmp_l[ i ] = sqrt( tmp_l[ i ] ) + EPSILON;
-							tmp_r[ i ] = sqrt( tmp_r[ i ] ) + EPSILON;
-							normFactor = fmax ( tmp_l[ i ], tmp_r[ i ] );
-							
-							*(firstValue_l + i ) /= normFactor;
-							*(firstValue_r + i ) /= normFactor;
-						}
-												
-					}
+						dcFilter->execFrame( firstValue1 + i, &value );
+					} else value = * ( firstValue1 + i );
 					
+					// 2- Pre-whitening
+					if ( this->pp_bPreEmphasis )
+						preEmphFilter->execFrame( &value, &value );
+
+					// 3- Automatic gain control (part 1)	
+					if ( this->pp_bNormalizeRMS ) {
+						*( tmp + i ) = pow( value, 2 );
+						agcFilter->execFrame( tmp + i, tmp + i );
+						*( tmp + i ) = sqrt( *( tmp + i ) ) + EPSILON_PP;
+					}
+
 					// 4- Level Scaling
 					if ( this->pp_bLevelScaling ) {
-						
-						double current_dboffset = 100; // dbspl(1) = 100;
-						double dbVar = pow( 10 , ( current_dboffset - this->pp_refSPLdB ) / 20 );
-
-						for ( unsigned int i = 0 ; i < dim_l ; ++i ) {
-							*(firstValue_l + i ) *= dbVar;
-							*(firstValue_r + i ) *= dbVar;
-						}
+						value *= dbVar;
 					}
+
+					// TODO : 5- Middle Ear Filtering
+					// if ( this->pp_bMiddleEarFiltering ) {}	
+
+					PMZ->appendFrame( &value );
+				}						
+				for ( uint32_t i = 0 ; i < dim2 ; ++i ) {
+					// 1- DC Filter					
+					if ( this->pp_bRemoveDC ) {
+						dcFilter->execFrame( firstValue2 + i, &value );
+					} else value = * ( firstValue2 + i );
 					
-					// 5- Middle Ear Filtering
-					if ( this->pp_bUnityComp ) {
+					// 2- Pre-whitening					
+					if ( this->pp_bPreEmphasis )
+						preEmphFilter->execFrame( &value, &value );	
+
+					// 3- Automatic gain control (part 1)	
+					if ( this->pp_bNormalizeRMS ) {
+						*( tmp + i + dim1 ) = pow( value, 2 );
+						agcFilter->execFrame( tmp + i + dim1, tmp + i + dim1 );
+						*( tmp + i + dim1 ) = sqrt( *( tmp + i + dim1 ) ) + EPSILON_PP;
+					}
+
+					// 4- Level Scaling
+					if ( this->pp_bLevelScaling ) {
+						value *= dbVar;
+					}
+
+					// TODO : 5- Middle Ear Filtering
+					//if ( this->pp_bMiddleEarFiltering ) {}	
+
+					PMZ->appendFrame( &value );
+				}						
 						
-						switch ( this->pp_middleEarModel ) {
-							case _jepsen:
-								this->meFilterPeakdB = 55.9986;
-								break;
-							case _lopezpoveda:
-								this->meFilterPeakdB = 66.2888;
-								break;
-							default:
-					 			this->meFilterPeakdB = 0;
-								break;
-						}
-					} else this->meFilterPeakdB = 0;
-					
-					if ( this->pp_bMiddleEarFiltering ) {
-						//	TODO 
-					}	  	  		
-					// Processed data is on PMZ
+				PMZ->setLastChunkSize( dim1 + dim2 );
 			}
-		
+
 			/* PreProc */
 			PreProc::PreProc (const std::string nameArg, std::shared_ptr<InputProc > upperProcPtr, bool pp_bRemoveDC,
 																						  double pp_cutoffHzDC,
@@ -167,30 +128,93 @@ using namespace std;
 			
 			void PreProc::processChunk () {
 	
-					this->setNFR ( upperProcPtr->getNFR() ); /* for rosAFE */
+				this->setNFR ( upperProcPtr->getNFR() ); /* for rosAFE */
 
-					// Appending the chunk to process (the processing must be done on the PMZ)
-					leftPMZ->appendChunk( this->upperProcPtr->getLeftLastChunkAccessor() );
-					rightPMZ->appendChunk( this->upperProcPtr->getRightLastChunkAccessor() );
-	
-					std::shared_ptr<twoCTypeBlock<double> > l_PMZ = leftPMZ->getLastChunkAccesor();
-					std::shared_ptr<twoCTypeBlock<double> > r_PMZ = rightPMZ->getLastChunkAccesor();
+				shared_ptr<twoCTypeBlock<double> > leftInput = this->upperProcPtr->getLeftLastChunkAccessor();
+				shared_ptr<twoCTypeBlock<double> > rightInput = this->upperProcPtr->getRightLastChunkAccessor();
 					
-					// 0- Initialization
-					std::size_t dim1_l = l_PMZ->array1.second;
-					std::size_t dim2_l = l_PMZ->array2.second;
-					std::size_t dim1_r = r_PMZ->array1.second;
-					std::size_t dim2_r = r_PMZ->array2.second;
-							
-					double* firstValue1_l = l_PMZ->array1.first;
-					double* firstValue2_l = l_PMZ->array2.first;
-					double* firstValue1_r = r_PMZ->array1.first;
-					double* firstValue2_r = r_PMZ->array2.first;				
-					
-					if ( ( dim1_l > 0 ) && ( dim1_r > 0 ) )
-						process ( firstValue1_l, dim1_l, firstValue1_r, dim1_r );
-					if ( ( dim2_l > 0 ) && ( dim2_r > 0 ) )	
-						process ( firstValue2_l, dim2_l, firstValue2_r, dim2_r );
+				size_t dim1 = leftInput->array1.second;
+				size_t dim2 = leftInput->array2.second;
+
+				double* firstValue1_l = leftInput->array1.first;
+				double* firstValue2_l = leftInput->array2.first;
+				double* firstValue1_r = rightInput->array1.first;
+				double* firstValue2_r = rightInput->array2.first;		
+
+				if ( this->pp_bUnityComp ) {
+						
+					switch ( this->pp_middleEarModel ) {
+						case _jepsen:
+							this->meFilterPeakdB = 55.9986;
+							break;
+						case _lopezpoveda:
+							this->meFilterPeakdB = 66.2888;
+							break;
+						default:
+				 			this->meFilterPeakdB = 0;
+							break;
+					}
+				} else this->meFilterPeakdB = 0;
+
+				vector<double> tmp_l, tmp_r;
+				// 3- Initialize the filter states if empty  (part init)
+				if ( this->pp_bNormalizeRMS ) {
+					tmp_l.resize( dim1 + dim2 ); tmp_r.resize( dim1 + dim2 );
+
+					if ( !( agcFilter_l->isInitialized() ) ) {
+						double intArg = this->pp_intTimeSecRMS * this->getFsIn();
+						double sum_l = 0, sum_r = 0, s0_l, s0_r;
+						uint32_t minVal;
+
+						// TODO : this should be compared with dim1 + dim2, however this doesnt occur a functional problem as dim2 is very likely to be 0 at this stage
+						minVal = fmin ( dim1, round( intArg ) ); 
+						
+						// Mean square of input over the time constant
+						for ( unsigned int i = 0 ; i < minVal ; ++i ) {
+							sum_l += pow( *(firstValue1_l + i ) , 2);
+							sum_r += pow( *(firstValue1_r + i ) , 2);
+						}
+									
+						// Initial filter states
+						s0_l = exp ( -1 / intArg ) * ( sum_l / minVal );							
+						s0_r = exp ( -1 / intArg ) * ( sum_r / minVal );
+								
+						this->agcFilter_l->reset( &s0_l, 1 );
+						this->agcFilter_r->reset( &s0_r, 1 );
+					}
+				}
+										
+				thread leftThread( &PreProc::process, this, dim1, firstValue1_l, dim2, firstValue2_l, this->leftPMZ, this->dcFilter_l, this->preEmphFilter_l, this->agcFilter_l, tmp_l.data() );
+				thread rightThread( &PreProc::process, this, dim1, firstValue1_r, dim2, firstValue2_r, this->rightPMZ, this->dcFilter_r, this->preEmphFilter_r, this->agcFilter_r, tmp_r.data() );
+						
+				leftThread.join();                // pauses until left finishes
+				rightThread.join();               // pauses until right finishes
+				
+				// 3- Automatic gain control (part 2)
+				if ( this->pp_bNormalizeRMS ) {
+
+					leftInput = this->leftPMZ->getLastChunkAccesor();
+					rightInput = this->rightPMZ->getLastChunkAccesor();
+
+					firstValue1_l = leftInput->array1.first;
+					firstValue2_l = leftInput->array2.first;
+					firstValue1_r = rightInput->array1.first;
+					firstValue2_r = rightInput->array2.first;	
+									
+					dim1 = leftInput->array1.second;
+					dim2 = leftInput->array2.second;
+																
+					for ( uint32_t i = 0 ; i < tmp_l.size() ; ++i ) {
+						tmp_l[ i ]  = fmax ( tmp_l[ i ], tmp_r[ i ] );
+						if ( i < dim1 )	{
+							*(firstValue1_l + i ) /= tmp_l[ i ];
+							*(firstValue1_r + i ) /= tmp_l[ i ];
+						} else {
+							*(firstValue2_l + i ) /= tmp_l[ i ];
+							*(firstValue2_r + i ) /= tmp_l[ i ];
+							} 
+						}							
+					}
 			}
 			
 			void PreProc::prepareForProcessing () {
@@ -209,9 +233,9 @@ using namespace std;
 
 				if ( this->pp_bPreEmphasis ) {
 					
-					std::vector<double> vectB (2,1);
+					vector<double> vectB (2,1);
 					vectB[1] = -1 * fabs( this->pp_coefPreEmphasis );
-					std::vector<double> vectA (1,1);
+					vector<double> vectA (1,1);
 					
 					this->preEmphFilter_l.reset ( new GenericFilter<double,double, double, double> ( vectB.data(), vectB.size(), vectA.data(), vectA.size() ) );
 					this->preEmphFilter_r.reset ( new GenericFilter<double,double, double, double> ( vectB.data(), vectB.size(), vectA.data(), vectA.size() ) );
@@ -225,8 +249,8 @@ using namespace std;
 				
 				if ( this->pp_bNormalizeRMS ) {
 
-					std::vector<double> vectB (1,1);
-					std::vector<double> vectA (2,1);
+					vector<double> vectB (1,1);
+					vector<double> vectA (2,1);
 					
 					vectA[1] = -1 * exp( -1 / ( this->pp_intTimeSecRMS * this->getFsIn() ) );
 					vectB[0] = vectA[0] + vectA[1];

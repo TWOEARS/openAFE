@@ -79,11 +79,8 @@ using namespace std;
 												 const shared_ptr<twoCTypeBlock<double> > leftChannel,
 												 const shared_ptr<twoCTypeBlock<double> > rightChannel ) {
 				// 0- Initialization
-				size_t dim1 = leftChannel->array1.second;
-				size_t dim2 = leftChannel->array2.second;
-
-				// size_t dim1_r = rightChannel->array1.second;
-				// size_t dim2_r = rightChannel->array2.second;
+				size_t dim1 = leftChannel->array1.second; // dim1_r = rightChannel->array1.second;
+				size_t dim2 = leftChannel->array2.second; // dim2_r = rightChannel->array2.second;
 								
 				complex<double > complexValue1, complexValue2;
 				double value1, value2;
@@ -148,13 +145,15 @@ using namespace std;
 			void GammatoneProc::processChunk ( ) {
 				this->setNFR ( this->upperProcPtr->getNFR() );
 
+				shared_ptr<twoCTypeBlock<double> > leftInput = this->upperProcPtr->getLeftLastChunkAccessor();
+				shared_ptr<twoCTypeBlock<double> > rightInput = this->upperProcPtr->getRightLastChunkAccessor();
+												 
 				vector<thread> threads;
-				  for ( size_t ii = 0 ; ii < this->cfHz.size() ; ++ii )
-					threads.push_back(thread( &GammatoneProc::processChannel, this, ii, 
-																					this->upperProcPtr->getLeftLastChunkAccessor(),
-																					this->upperProcPtr->getRightLastChunkAccessor() ));
-				  // Waiting to join the threads
-				  for (auto& t : threads)
+				for ( size_t ii = 0 ; ii < this->cfHz.size() ; ++ii )
+					threads.push_back(thread( &GammatoneProc::processChannel, this, ii, leftInput, rightInput ));
+					
+				// Waiting to join the threads
+				for (auto& t : threads)
 					t.join();
 			}
 			

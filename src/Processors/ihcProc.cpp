@@ -225,27 +225,27 @@ using namespace std;
 			}
 
 			void IHCProc::processChannel ( const size_t ii,
-									  const vector<shared_ptr<twoCTypeBlock<double> > >& leftChannel,
-									  const vector<shared_ptr<twoCTypeBlock<double> > >& rightChannel ) {
+									       const shared_ptr<twoCTypeBlock<double> > leftChannel,
+									       const shared_ptr<twoCTypeBlock<double> > rightChannel ) {
 										  				
 					  switch ( this->method ) {
 						  case _joergensen: // Not implemented yet
 						  case _breebart: // Not implemented yet
 						  case _bernstein: // Not implemented yet
 						  case _none:
-							this->processNone( ii, leftChannel[ii], rightChannel[ii] );
+							this->processNone( ii, leftChannel, rightChannel );
 							break;
 						  case _halfwave:
-							this->processHalfWave( ii, leftChannel[ii], rightChannel[ii] );
+							this->processHalfWave( ii, leftChannel, rightChannel );
 							break;
 						  case _fullwave:
-							this->processFullWave( ii, leftChannel[ii], rightChannel[ii] );
+							this->processFullWave( ii, leftChannel, rightChannel );
 							break;
 					      case _square:
-							this->processSquare( ii, leftChannel[ii], rightChannel[ii] );
+							this->processSquare( ii, leftChannel, rightChannel );
 							break;						  
 						  case _dau:
-							this->processDAU( ii, leftChannel[ii], rightChannel[ii], this->ihcFilter_l[ii], this->ihcFilter_r[ii] );
+							this->processDAU( ii, leftChannel, rightChannel, this->ihcFilter_l[ii], this->ihcFilter_r[ii] );
 							break;
 						  default :
 							break;
@@ -273,12 +273,15 @@ using namespace std;
 			void IHCProc::processChunk ( ) {
 				this->setNFR ( this->upperProcPtr->getNFR() );
 
+				vector<shared_ptr<twoCTypeBlock<double> > > leftInput = this->upperProcPtr->getLeftLastChunkAccessor();
+				vector<shared_ptr<twoCTypeBlock<double> > > rightInput = this->upperProcPtr->getRightLastChunkAccessor();
+				
 				vector<thread> threads;
-				  for ( size_t ii = 0 ; ii < this->get_nChannel() ; ++ii )
-					threads.push_back(thread( &IHCProc::processChannel, this, ii, ref(this->upperProcPtr->getLeftLastChunkAccessor()),
-																				  ref(this->upperProcPtr->getRightLastChunkAccessor()) ));
-				  // Waiting to join the threads
-				  for (auto& t : threads)
+				for ( size_t ii = 0 ; ii < this->get_nChannel() ; ++ii )
+					threads.push_back(thread( &IHCProc::processChannel, this, ii, leftInput[ii], rightInput[ii] ));
+					
+				// Waiting to join the threads
+				for (auto& t : threads)
 					t.join();
 			}
 			

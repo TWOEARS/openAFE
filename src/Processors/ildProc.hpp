@@ -18,6 +18,7 @@ namespace openAFE {
 			void processChannel ( const std::size_t ii, const std::size_t totalFrames,
 								  const std::shared_ptr<twoCTypeBlock<double> > leftChannel,
 								  const std::shared_ptr<twoCTypeBlock<double> > rightChannel );
+								  
 			inline
 			double ild( double* frame_r, double* frame_l );
 			

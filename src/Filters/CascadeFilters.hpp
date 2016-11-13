@@ -10,6 +10,8 @@
 
 #include "GenericFilter.hpp"
 
+#include <iostream>
+
 namespace openAFE {
 
 	template< typename T_in = double, typename T_out = double, typename T_b = double, typename T_a = double >
@@ -34,9 +36,8 @@ namespace openAFE {
 		}
 
 		inline
-		void execFrame( T_in* srcStart, T_out* dst ) {
-			
-			filterVector[0]->execFrame( srcStart, dst );
+		void execFrame( T_in* src, T_out* dst ) {
+			filterVector[0]->execFrame( src, dst );
 			for ( std::size_t ii = 1 ; ii < cascadeOrder ; ++ii )
 				filterVector[ii]->execFrame( dst, dst );
 		}

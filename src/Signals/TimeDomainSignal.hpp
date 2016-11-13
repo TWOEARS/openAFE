@@ -37,11 +37,15 @@ namespace openAFE {
 			this->wholeBufferInfo.reset();
 			this->oldDataInfo.reset();
 		}
-		
-		void appendTChunk( T* inChunk, size_t dim ) {
-			this->buffer->push_chunk( inChunk, dim );
+
+		void appendFrame( T* inFrame ) {
+			this->buffer->push_frame( inFrame );
 		}
-		
+
+		void setLastChunkSize( std::size_t lastChunkSize ) {
+			this->buffer->setLastChunkSize( lastChunkSize );
+		}
+						
 		void appendChunk( std::shared_ptr<twoCTypeBlock<T> > inChunk ) {
 			this->buffer->push_chunk( inChunk );
 		}

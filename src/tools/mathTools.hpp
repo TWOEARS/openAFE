@@ -55,7 +55,7 @@ namespace openAFE {
 		/// Based On : http://toto-share.com/2011/11/cc-convolution-source-code/
 		/// 
 		template<typename T = double>
-		std::vector<T> conv( T* A, size_t lenA, T* B, size_t lenB ) {
+		std::vector<T> conv( T* A, int32_t lenA, T* B, int32_t lenB ) {
 			int32_t nconv;
 			int32_t j, i1;
 			T tmp;
@@ -65,7 +65,7 @@ namespace openAFE {
 			std::vector<T > C ( nconv, 0 );
 
 			//convolution process
-			for ( uint32_t i = 0 ; i < nconv; i++ ) {
+			for ( int32_t i = 0 ; i < nconv; i++ ) {
 				i1 = i;
 				tmp = 0.0;
 				for (j=0; j<lenB; j++)

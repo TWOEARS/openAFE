@@ -65,8 +65,11 @@ namespace openAFE {
             void verifyParameters();
 						
 			// Actual Processing
-			void process ( double* firstValue_l, size_t dim_l, double* firstValue_r, size_t dim_r );
-													
+			void process ( std::size_t dim1, double* firstValue1, std::size_t dim2, double* firstValue2, std::shared_ptr <TimeDomainSignal<double> > PMZ , bwFilterPtr dcFilter,
+																																						   genericFilterPtr preEmphFilter,
+																																						   genericFilterPtr agcFilter,
+																																						   double* tmp );
+										
 		public:
 		
 			/* PreProc */

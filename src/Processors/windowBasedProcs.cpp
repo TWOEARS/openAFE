@@ -3,8 +3,8 @@
 using namespace openAFE;
 using namespace std;
 
-			uint32_t WindowBasedProcs::calcFsOut( double ild_hSizeSec ) {
-				return 1 / ild_hSizeSec;
+			uint32_t WindowBasedProcs::calcFsOut( double hSizeSec ) {
+				return 1 / hSizeSec;
 			}
 
 			void WindowBasedProcs::prepareForProcessing() {

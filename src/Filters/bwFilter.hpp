@@ -13,11 +13,7 @@
 
 namespace openAFE {
 
-	class bwFilter : public CascadeFilters < double, double, double, double > {
-		
-		uint32_t order;
-		
-		uint32_t cascadeNumber( uint32_t argOrder );
+	class bwFilter : public GenericFilter < double, double, double, double > {
 				
 		public:
 				
