@@ -129,11 +129,6 @@ namespace openAFE {
 		T meanSquare( T* firstValue_src, size_t dim ) {
 			return sumPow( firstValue_src, dim, 2 ) / dim;
 		}
-
-		template <typename T = double>
-		T ild( T frame_r, T frame_l ) {
-		  return 10 * log10 ( ( frame_r + EPSILON ) / ( frame_l + EPSILON ) );
-		}
 		
 	    /// NEXTPOW2(N) returns the first P such that 2.^P >= abs(N).  It is
 		/// often useful for finding the nearest power of two sequence

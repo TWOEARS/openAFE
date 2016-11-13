@@ -47,70 +47,209 @@ using namespace std;
 
 			}
 
-			void IHCProc::processHalfWave ( size_t& dim1_l, size_t& dim2_l, double* firstValue1_l, double* firstValue2_l, size_t& dim1_r, size_t& dim2_r, double* firstValue1_r, double* firstValue2_r ) {
-						
-				// Halfwave rectification
-				size_t ii;
-				for ( ii = 0 ; ii < dim1_l ; ++ii ) {
-					*( firstValue1_l + ii ) = fmax( *( firstValue1_l + ii ), 0 );
-					*( firstValue1_r + ii ) = fmax( *( firstValue1_r + ii ), 0 );					
-				}
-				
-				if ( dim2_l > 0 ) {
-					 for ( ii = 0 ; ii < dim2_l ; ++ii ) {
-						*( firstValue2_l + ii ) = fmax( *( firstValue2_l + ii ), 0 );
-						*( firstValue2_r + ii ) = fmax( *( firstValue2_r + ii ), 0 );						
-					}	
-				}
-			}	
-			
-			void IHCProc::processFullWave ( size_t& dim1_l, size_t& dim2_l, double* firstValue1_l, double* firstValue2_l, size_t& dim1_r, size_t& dim2_r, double* firstValue1_r, double* firstValue2_r ) {
-						
-				// Halfwave rectification
-				size_t ii;
-				for ( ii = 0 ; ii < dim1_l ; ++ii ) {
-					*( firstValue1_l + ii ) = fabs( *( firstValue1_l + ii ) );
-					*( firstValue1_r + ii ) = fabs( *( firstValue1_r + ii ) );					
-				}
-				
-				if ( dim2_l > 0 ) {
-					 for ( ii = 0 ; ii < dim2_l ; ++ii ) {
-						*( firstValue2_l + ii ) = fabs( *( firstValue2_l + ii ) );
-						*( firstValue2_r + ii ) = fabs( *( firstValue2_r + ii ) );						
-					}	
-				}
-			}				
-
-			void IHCProc::processSquare ( size_t& dim1_l, size_t& dim2_l, double* firstValue1_l, double* firstValue2_l, size_t& dim1_r, size_t& dim2_r, double* firstValue1_r, double* firstValue2_r ) {
-						
-				// Halfwave rectification
-				size_t ii;
-				for ( ii = 0 ; ii < dim1_l ; ++ii ) {
-					*( firstValue1_l + ii ) = pow( fabs( *( firstValue1_l + ii ) ), 2 );
-					*( firstValue1_r + ii ) = pow( fabs( *( firstValue1_r + ii ) ), 2 );					
-				}
-				
-				if ( dim2_l > 0 ) {
-					 for ( ii = 0 ; ii < dim2_l ; ++ii ) {
-						*( firstValue2_l + ii ) = pow( fabs( *( firstValue2_l + ii ) ), 2 );
-						*( firstValue2_r + ii ) = pow( fabs( *( firstValue2_r + ii ) ), 2 );				
-					}	
-				}
-			}					
+			void IHCProc::processNone  ( const size_t ii, const shared_ptr<twoCTypeBlock<double> > leftChannel, 
+														  const shared_ptr<twoCTypeBlock<double> > rightChannel ) {
 															
-			void IHCProc::processDAU ( size_t& dim1_l, size_t& dim2_l, double* firstValue1_l, double* firstValue2_l, bwFilterPtr filter_l, size_t& dim1_r, size_t& dim2_r, double* firstValue1_r, double* firstValue2_r, bwFilterPtr filter_r ) {
+				// 0- Initialization
+				size_t dim1 = leftChannel->array1.second;
+				size_t dim2 = leftChannel->array2.second;
 						
-				// Halfwave rectification
-				this->processHalfWave ( dim1_l, dim2_l, firstValue1_l, firstValue2_l, dim1_r, dim2_r, firstValue1_r, firstValue2_r );
-								
-				// Filtering
-				filter_l->exec( firstValue1_l, dim1_l, firstValue1_l );
-				filter_r->exec( firstValue1_r, dim1_r, firstValue1_r );
-				
-				if ( dim2_l > 0 ) {
-					filter_l->exec( firstValue2_l, dim2_l, firstValue2_l );
-					filter_r->exec( firstValue2_r, dim2_r, firstValue2_r );
+				if ( dim1 > 0 ) { 		
+ 					double* firstValue_l = leftChannel->array1.first;
+					double* firstValue_r = rightChannel->array1.first;
+					for ( size_t iii = 0 ; iii < dim1 ; ++iii ) {
+						leftPMZ->appendFrameToChannel( ii, ( firstValue_l + iii ) );
+						rightPMZ->appendFrameToChannel( ii, ( firstValue_r + iii ) );
+					}
+				}				
+				if ( dim2 > 0 ) {
+ 					double* firstValue_l = leftChannel->array2.first;
+					double* firstValue_r = rightChannel->array2.first;
+					for ( size_t iii = 0 ; iii < dim2 ; ++iii ) {
+						leftPMZ->appendFrameToChannel( ii, ( firstValue_l + iii ) );
+						rightPMZ->appendFrameToChannel( ii, ( firstValue_r + iii ) );
+					}
 				}
+				
+				leftPMZ->setLastChunkSize( ii, dim1 + dim2 );
+				rightPMZ->setLastChunkSize( ii, dim1 + dim2 );				
+			}
+		
+			void IHCProc::processHalfWave  ( const size_t ii, const shared_ptr<twoCTypeBlock<double> > leftChannel, 
+														const shared_ptr<twoCTypeBlock<double> > rightChannel ) {
+															
+				// 0- Initialization
+				size_t dim1 = leftChannel->array1.second;
+				size_t dim2 = leftChannel->array2.second;
+						
+				double value1, value2;
+				if ( dim1 > 0 ) { 		
+ 					double* firstValue_l = leftChannel->array1.first;
+					double* firstValue_r = rightChannel->array1.first;
+					for ( size_t iii = 0 ; iii < dim1 ; ++iii ) {			
+						value1 = fmax( *( firstValue_l + iii ), 0 );
+						value2 = fmax( *( firstValue_r + iii ), 0 );
+						
+						leftPMZ->appendFrameToChannel( ii, &value1 );
+						rightPMZ->appendFrameToChannel( ii, &value2 );						
+					}
+				}				
+				if ( dim2 > 0 ) {
+ 					double* firstValue_l = leftChannel->array2.first;
+					double* firstValue_r = rightChannel->array2.first;
+					for ( size_t iii = 0 ; iii < dim2 ; ++iii ) {
+						value1 = fmax( *( firstValue_l + iii ), 0 );
+						value2 = fmax( *( firstValue_r + iii ), 0 );
+						
+						leftPMZ->appendFrameToChannel( ii, &value1 );
+						rightPMZ->appendFrameToChannel( ii, &value2 );	
+					}
+				}
+				
+				leftPMZ->setLastChunkSize( ii, dim1 + dim2 );
+				rightPMZ->setLastChunkSize( ii, dim1 + dim2 );				
+			}
+						
+			void IHCProc::processFullWave  ( const size_t ii, const shared_ptr<twoCTypeBlock<double> > leftChannel, 
+														const shared_ptr<twoCTypeBlock<double> > rightChannel ) {
+															
+				// 0- Initialization
+				size_t dim1 = leftChannel->array1.second;
+				size_t dim2 = leftChannel->array2.second;
+						
+				double value1, value2;
+				if ( dim1 > 0 ) { 		
+ 					double* firstValue_l = leftChannel->array1.first;
+					double* firstValue_r = rightChannel->array1.first;
+					for ( size_t iii = 0 ; iii < dim1 ; ++iii ) {
+						value1 = fabs( *( firstValue_l + iii ) );
+						value2 = fabs( *( firstValue_r + iii ) );
+						
+						leftPMZ->appendFrameToChannel( ii, &value1 );
+						rightPMZ->appendFrameToChannel( ii, &value2 );
+					}
+				}				
+				if ( dim2 > 0 ) {
+ 					double* firstValue_l = leftChannel->array2.first;
+					double* firstValue_r = rightChannel->array2.first;
+					for ( size_t iii = 0 ; iii < dim2 ; ++iii ) {
+						value1 = fabs( *( firstValue_l + iii ) );
+						value2 = fabs( *( firstValue_r + iii ) );
+						
+						leftPMZ->appendFrameToChannel( ii, &value1 );
+						rightPMZ->appendFrameToChannel( ii, &value2 );
+					}
+				}
+				
+				leftPMZ->setLastChunkSize( ii, dim1 + dim2 );
+				rightPMZ->setLastChunkSize( ii, dim1 + dim2 );				
+			}
+
+			void IHCProc::processSquare  ( const size_t ii, const shared_ptr<twoCTypeBlock<double> > leftChannel, 
+														const shared_ptr<twoCTypeBlock<double> > rightChannel ) {
+															
+				// 0- Initialization
+				size_t dim1 = leftChannel->array1.second;
+				size_t dim2 = leftChannel->array2.second;
+						
+				double value1, value2;
+				if ( dim1 > 0 ) { 		
+ 					double* firstValue_l = leftChannel->array1.first;
+					double* firstValue_r = rightChannel->array1.first;
+					for ( size_t iii = 0 ; iii < dim1 ; ++iii ) {
+						value1 = pow( fabs( *( firstValue_l + iii ) ), 2 );
+						value2 = pow( fabs( *( firstValue_r + iii ) ), 2 );
+						
+						leftPMZ->appendFrameToChannel( ii, &value1 );
+						rightPMZ->appendFrameToChannel( ii, &value2 );
+					}
+				}				
+				if ( dim2 > 0 ) {
+ 					double* firstValue_l = leftChannel->array2.first;
+					double* firstValue_r = rightChannel->array2.first;
+					for ( size_t iii = 0 ; iii < dim2 ; ++iii ) {
+						value1 = pow( fabs( *( firstValue_l + iii ) ), 2 );
+						value2 = pow( fabs( *( firstValue_r + iii ) ), 2 );
+						
+						leftPMZ->appendFrameToChannel( ii, &value1 );
+						rightPMZ->appendFrameToChannel( ii, &value2 );
+					}
+				}
+				
+				leftPMZ->setLastChunkSize( ii, dim1 + dim2 );
+				rightPMZ->setLastChunkSize( ii, dim1 + dim2 );				
+			}
+			
+			void IHCProc::processDAU ( const size_t ii, const shared_ptr<twoCTypeBlock<double> > leftChannel, 
+														const shared_ptr<twoCTypeBlock<double> > rightChannel, 
+														bwFilterPtr filter_l,
+														bwFilterPtr filter_r ) {
+															
+				// 0- Initialization
+				size_t dim1 = leftChannel->array1.second;
+				size_t dim2 = leftChannel->array2.second;
+						
+				// DAU = Halfwave rectification + BW filtering
+				double value1, value2;
+				if ( dim1 > 0 ) { 		
+ 					double* firstValue_l = leftChannel->array1.first;
+					double* firstValue_r = rightChannel->array1.first;
+					for ( size_t iii = 0 ; iii < dim1 ; ++iii ) {
+						value1 = fmax( *( firstValue_l + iii ), 0 ); 
+						value2 = fmax( *( firstValue_r + iii ), 0 ); 
+
+						filter_l->execFrame( &value1, &value1 );
+						filter_r->execFrame( &value2, &value2 );
+						
+						leftPMZ->appendFrameToChannel( ii, &value1 );
+						rightPMZ->appendFrameToChannel( ii, &value2 );
+					}
+				}				
+				if ( dim2 > 0 ) {
+ 					double* firstValue_l = leftChannel->array2.first;
+					double* firstValue_r = rightChannel->array2.first;
+					for ( size_t iii = 0 ; iii < dim2 ; ++iii ) {
+						value1 = fmax( *( firstValue_l + iii ), 0 ); 
+						value2 = fmax( *( firstValue_r + iii ), 0 ); 
+
+						filter_l->execFrame( &value1, &value1 );
+						filter_r->execFrame( &value2, &value2 );
+						
+						leftPMZ->appendFrameToChannel( ii, &value1 );
+						rightPMZ->appendFrameToChannel( ii, &value2 );
+					}
+				}
+				
+				leftPMZ->setLastChunkSize( ii, dim1 + dim2 );
+				rightPMZ->setLastChunkSize( ii, dim1 + dim2 );				
+			}
+
+			void IHCProc::processChannel ( const size_t ii,
+									  const vector<shared_ptr<twoCTypeBlock<double> > >& leftChannel,
+									  const vector<shared_ptr<twoCTypeBlock<double> > >& rightChannel ) {
+										  				
+					  switch ( this->method ) {
+						  case _joergensen: // Not implemented yet
+						  case _breebart: // Not implemented yet
+						  case _bernstein: // Not implemented yet
+						  case _none:
+							this->processNone( ii, leftChannel[ii], rightChannel[ii] );
+							break;
+						  case _halfwave:
+							this->processHalfWave( ii, leftChannel[ii], rightChannel[ii] );
+							break;
+						  case _fullwave:
+							this->processFullWave( ii, leftChannel[ii], rightChannel[ii] );
+							break;
+					      case _square:
+							this->processSquare( ii, leftChannel[ii], rightChannel[ii] );
+							break;						  
+						  case _dau:
+							this->processDAU( ii, leftChannel[ii], rightChannel[ii], this->ihcFilter_l[ii], this->ihcFilter_r[ii] );
+							break;
+						  default :
+							break;
+					  }
 			}
 																
 			IHCProc::IHCProc (const std::string nameArg, std::shared_ptr<GammatoneProc > upperProcPtr, ihcMethod method ) : TFSProcessor<double > (nameArg, upperProcPtr->getFsOut(), upperProcPtr->getFsOut(), upperProcPtr->getBufferSize_s(), upperProcPtr->get_nChannel(), _magnitude, _ihc) {
@@ -132,57 +271,15 @@ using namespace std;
 			}
 			
 			void IHCProc::processChunk ( ) {
-
 				this->setNFR ( this->upperProcPtr->getNFR() );
-				
-				// Appending the chunk to process (the processing must be done on the PMZ)
-				leftPMZ->appendChunk( this->upperProcPtr->getLeftLastChunkAccessor() );
-				rightPMZ->appendChunk( this->upperProcPtr->getRightLastChunkAccessor() );
-								
-				vector<shared_ptr<twoCTypeBlock<double> > > l_PMZ = leftPMZ->getLastChunkAccesor();
-				vector<shared_ptr<twoCTypeBlock<double> > > r_PMZ = rightPMZ->getLastChunkAccesor();
-				
+
 				vector<thread> threads;
-				for ( size_t ii = 0 ; ii < this->get_nChannel() ; ++ii ) {
-					  
-					  size_t dim1_l = l_PMZ[ii]->array1.second;
-					  size_t dim2_l = l_PMZ[ii]->array2.second;
-							
-					  double* firstValue1_l = l_PMZ[ii]->array1.first;
-					  double* firstValue2_l = l_PMZ[ii]->array2.first;
-
-					  size_t dim1_r = r_PMZ[ii]->array1.second;
-					  size_t dim2_r = r_PMZ[ii]->array2.second;
-							
-					  double* firstValue1_r = r_PMZ[ii]->array1.first;
-					  double* firstValue2_r = r_PMZ[ii]->array2.first;
-					  				
-					  switch ( this->method ) {
-						  case _none:
-							break;
-						  case _halfwave:
-						    threads.push_back(thread( &IHCProc::processHalfWave, this, ref(dim1_l), ref(dim2_l), firstValue1_l, firstValue2_l, ref(dim1_r), ref(dim2_r), firstValue1_r, firstValue2_r ) );
-							break;
-						  case _fullwave:
-						    threads.push_back(thread( &IHCProc::processFullWave, this, ref(dim1_l), ref(dim2_l), firstValue1_l, firstValue2_l, ref(dim1_r), ref(dim2_r), firstValue1_r, firstValue2_r ) );					 
-							break;
-					      case _square:
-						    threads.push_back(thread( &IHCProc::processSquare, this, ref(dim1_l), ref(dim2_l), firstValue1_l, firstValue2_l, ref(dim1_r), ref(dim2_r), firstValue1_r, firstValue2_r ) );					 							
-							break;
-						  case _joergensen:
-						  case _breebart:
-						  case _bernstein:						  
-						  case _dau:
-							threads.push_back(thread( &IHCProc::processDAU, this, ref(dim1_l), ref(dim2_l), firstValue1_l, firstValue2_l, ref(this->ihcFilter_l[ii]), ref(dim1_r), ref(dim2_r), firstValue1_r, firstValue2_r, ref(this->ihcFilter_r[ii]) ) );
-							break;
-						  default :
-							break;
-					  }
-				   }
-
-				   // Waiting to join the threads
-				   for (auto& t : threads)
-					t.join();	
+				  for ( size_t ii = 0 ; ii < this->get_nChannel() ; ++ii )
+					threads.push_back(thread( &IHCProc::processChannel, this, ii, ref(this->upperProcPtr->getLeftLastChunkAccessor()),
+																				  ref(this->upperProcPtr->getRightLastChunkAccessor()) ));
+				  // Waiting to join the threads
+				  for (auto& t : threads)
+					t.join();
 			}
 			
 			/* Comapres informations and the current parameters of two processors */

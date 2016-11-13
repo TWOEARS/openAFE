@@ -3,15 +3,35 @@
 using namespace openAFE;
 using namespace std;
 
-			void ILDProc::processChannel( double* firstValue_l, double* firstValue_r, double *result ) {
+			double ILDProc::ild( double* frame_r, double* frame_l ) {	
+				return 10 * log10 ( ( *frame_r + EPSILON ) / ( *frame_l + EPSILON ) );
+			}
 
-				multiplication( this->win.data(), firstValue_l, this->wSize, firstValue_l );
-				multiplication( this->win.data(), firstValue_r, this->wSize, firstValue_r );
-							
-				double mSq_l = meanSquare( firstValue_l, this->wSize );
-				double mSq_r = meanSquare( firstValue_r, this->wSize );
+			void ILDProc::processChannel ( const size_t ii, const size_t totalFrames,
+										   const shared_ptr<twoCTypeBlock<double> > leftChannel,
+										   const shared_ptr<twoCTypeBlock<double> > rightChannel ) {
 				
-				*(result) = ild( mSq_r, mSq_l );
+				double* firstValue_l = leftChannel->array1.first;
+				double* firstValue_r = rightChannel->array1.first;
+				
+				uint32_t n_start;			
+			    vector<double > tmpWindowLeft( this->wSize ), tmpWindowRight( this->wSize );
+				double value, mSq_l, mSq_r;
+							
+				for ( size_t iii = 0 ; iii < totalFrames ; ++iii ) {
+					n_start = iii * this->hSize;
+
+					multiplication( this->win.data(), firstValue_l + n_start, this->wSize, tmpWindowLeft.data() );
+					multiplication( this->win.data(), firstValue_r + n_start, this->wSize, tmpWindowRight.data() );
+					
+					mSq_l = meanSquare( tmpWindowLeft.data(), this->wSize );
+					mSq_r = meanSquare( tmpWindowRight.data(), this->wSize );					
+
+					value = this->ild( &mSq_r, &mSq_l );	
+						
+					leftPMZ->appendFrameToChannel( ii, &value );	
+				}
+				leftPMZ->setLastChunkSize( ii, totalFrames );
 			}
 					
 			ILDProc::ILDProc (const string nameArg, shared_ptr<IHCProc > upperProcPtr, double wSizeSec, double hSizeSec, windowType wname  )
@@ -30,40 +50,22 @@ using namespace std;
 				this->buffer_l->appendChunk( this->upperProcPtr->getLeftLastChunkAccessor() );
 				this->buffer_r->appendChunk( this->upperProcPtr->getRightLastChunkAccessor() );
 				
-				
 				/* The buffer should be linearized for windowing. */
-				this->buffer_l->linearizeBuffer();
-				this->buffer_r->linearizeBuffer();
-								
+				this->buffer_l->linearizeBuffer();	// dim2 is now 0.
+				this->buffer_r->linearizeBuffer();  // dim2 is now 0.
+
+				size_t totalFrames = floor( ( this->buffer_l->getSize() - ( this->wSize - this->hSize ) ) / this->hSize );
+
 				vector<shared_ptr<twoCTypeBlock<double> > > l_innerBuffer = buffer_l->getWholeBufferAccesor();
 				vector<shared_ptr<twoCTypeBlock<double> > > r_innerBuffer = buffer_r->getWholeBufferAccesor();
-				
+
 				// Quick control of dimensionality
 				assert( l_innerBuffer.size() == r_innerBuffer.size() );
-				
-				size_t totalFrames = floor( ( this->buffer_l->getSize() - ( this->wSize - this->hSize ) ) / this->hSize );
 												
-				// Creating a chunk of zeros.
-				this->zerosVector.resize( totalFrames, 0 );
-				
-				// Creating a accesor to it (The data on zerosVector is continious)
-				this->zerosAccecor->array1.first = zerosVector.data(); this->zerosAccecor->array2.first = nullptr;
-				this->zerosAccecor->array1.second = zerosVector.size(); this->zerosAccecor->array2.second = 0;
-
-				// Appending this chunk to all channels of the PMZ.
-				leftPMZ->appendNChunk( zerosAccecor );
-				vector<shared_ptr<twoCTypeBlock<double> > > lastChunkOfPMZ = leftPMZ->getLastChunkAccesor();
-										
 				size_t ii;
-				uint32_t n_start;
-				for ( ii = 0 ; ii < totalFrames ; ++ii ) {
-						
-					n_start = ii * this->hSize;
-					
-					// Loop on the channels : Got better run-time results when not creating threads.
-					for ( size_t jj = 0 ; jj < this->fb_nChannels ; ++jj )
-						processChannel( l_innerBuffer[jj]->getPtr(n_start), r_innerBuffer[jj]->getPtr(n_start), lastChunkOfPMZ[jj]->getPtr(ii) );
-				}
-				this->buffer_l->pop_chunk( ii * this->hSize );
-				this->buffer_r->pop_chunk( ii * this->hSize );
+				for ( ii = 0 ; ii < this->fb_nChannels ; ++ii )
+					this->processChannel( ii, totalFrames, l_innerBuffer[ii], r_innerBuffer[ii] );
+				
+				this->buffer_l->pop_chunk( totalFrames * this->hSize );
+				this->buffer_r->pop_chunk( totalFrames * this->hSize );			
 			}

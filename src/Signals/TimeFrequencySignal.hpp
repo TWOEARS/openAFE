@@ -129,6 +129,11 @@ namespace openAFE {
 			for ( std::size_t ii = 0 ; ii < this->nChannel ; ++ii )
 				this->buffer[ii]->linearizeBuffer();			
 		}
+
+		void linearizeOneBuffer( std::size_t ii ) {
+			if ( ii < this->nChannel )
+				this->buffer[ii]->linearizeBuffer();			
+		}
 		
 		std::size_t getSize() {
 			return this->buffer[0]->getSize();

@@ -42,20 +42,30 @@ namespace openAFE {
 			std::shared_ptr<GammatoneProc > upperProcPtr;
 
 			uint32_t fb_nChannels;
-
+				
 			void populateFilters( filterPtrVector& filters );
+
+			inline
+			void processNone  ( const std::size_t ii, const std::shared_ptr<twoCTypeBlock<double> > leftChannel, const std::shared_ptr<twoCTypeBlock<double> > rightChannel );
 			
 			inline
-			void processHalfWave ( size_t& dim1_l, size_t& dim2_l, double* firstValue1_l, double* firstValue2_l, size_t& dim1_r, size_t& dim2_r, double* firstValue1_r, double* firstValue2_r );
+			void processHalfWave  ( const std::size_t ii, const std::shared_ptr<twoCTypeBlock<double> > leftChannel, const std::shared_ptr<twoCTypeBlock<double> > rightChannel );
 
 			inline
-			void processFullWave ( size_t& dim1_l, size_t& dim2_l, double* firstValue1_l, double* firstValue2_l, size_t& dim1_r, size_t& dim2_r, double* firstValue1_r, double* firstValue2_r );
+			void processFullWave  ( const std::size_t ii, const std::shared_ptr<twoCTypeBlock<double> > leftChannel, const std::shared_ptr<twoCTypeBlock<double> > rightChannel );
 
 			inline
-			void processSquare ( size_t& dim1_l, size_t& dim2_l, double* firstValue1_l, double* firstValue2_l, size_t& dim1_r, size_t& dim2_r, double* firstValue1_r, double* firstValue2_r );
+			void processSquare  ( const std::size_t ii, const std::shared_ptr<twoCTypeBlock<double> > leftChannel, const std::shared_ptr<twoCTypeBlock<double> > rightChannel );
 						
 			inline
-			void processDAU ( size_t& dim1_l, size_t& dim2_l, double* firstValue1_l, double* firstValue2_l, bwFilterPtr filter_l, size_t& dim1_r, size_t& dim2_r, double* firstValue1_r, double* firstValue2_r, bwFilterPtr filter_r );
+			void processDAU ( const std::size_t ii, const std::shared_ptr<twoCTypeBlock<double> > leftChannel, 
+																					 const std::shared_ptr<twoCTypeBlock<double> > rightChannel, 
+																					 bwFilterPtr filter_l,
+																					 bwFilterPtr filter_r );
+																					 
+			void processChannel ( const std::size_t ii,
+									  const std::vector<std::shared_ptr<twoCTypeBlock<double> > >& leftChannel,
+									  const std::vector<std::shared_ptr<twoCTypeBlock<double> > >& rightChannel );
 
 		public:
 																		

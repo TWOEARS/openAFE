@@ -36,8 +36,15 @@ namespace openAFE {
 
 			void prepareForProcessing();
 
-			void processChannel( double* firstValue_l, double* firstValue_r, double *resultLeft, double *resultRight );
-			
+			void processFilter (  const std::size_t ii,
+								  const std::shared_ptr<twoCTypeBlock<double> > leftChannel,
+								  const std::shared_ptr<twoCTypeBlock<double> > rightChannel );			
+								  
+
+			void processWindow (  const std::size_t ii, const std::size_t totalFrames,
+										   const std::shared_ptr<twoCTypeBlock<double> > leftChannel,
+										   const std::shared_ptr<twoCTypeBlock<double> > rightChannel ); 
+										   								  
 		public:
 		
 			Ratemap (const std::string nameArg, std::shared_ptr<IHCProc > upperProcPtr, double wSizeSec = 0.02, double hSizeSec = 0.01, scalingType scailingArg = _power, double decaySec = 0.008, windowType wname = _hann );

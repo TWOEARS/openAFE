@@ -36,7 +36,7 @@ namespace openAFE {
 		inline
 		void execFrame( T_in* srcStart, T_out* dst ) {
 			
-			*dst = filterVector[0]->execFrame( srcStart );
+			filterVector[0]->execFrame( srcStart, dst );
 			for ( std::size_t ii = 1 ; ii < cascadeOrder ; ++ii )
 				filterVector[ii]->execFrame( dst, dst );
 		}

@@ -85,20 +85,21 @@ using namespace std;
 				// size_t dim1_r = rightChannel->array1.second;
 				// size_t dim2_r = rightChannel->array2.second;
 								
-				complex<double > complexValue;
-				double value;
+				complex<double > complexValue1, complexValue2;
+				double value1, value2;
 				if ( dim1 > 0 ) {
 					double* firstValue_l = leftChannel->array1.first;
 					double* firstValue_r = rightChannel->array1.first;
 					
 					for ( size_t iii = 0 ; iii < dim1 ; ++iii ) {
-						leftFilters[ii]->execFrame( firstValue_l + iii, &complexValue );
-						value = complexValue.real() * 2;
-						leftPMZ->appendFrameToChannel( ii, &value );
+						leftFilters[ii]->execFrame( firstValue_l + iii, &complexValue1 );
+						rightFilters[ii]->execFrame( firstValue_r + iii, &complexValue2 );
+
+						value1 = complexValue1.real() * 2;
+						value2 = complexValue2.real() * 2;
 						
-						rightFilters[ii]->execFrame( firstValue_r + iii, &complexValue );
-						value = complexValue.real() * 2;
-						rightPMZ->appendFrameToChannel( ii, &value );
+						leftPMZ->appendFrameToChannel( ii, &value1 );
+						rightPMZ->appendFrameToChannel( ii, &value2 );
 					}
 				}
 				if ( dim2 > 0 )	{
@@ -106,13 +107,14 @@ using namespace std;
 					double* firstValue_r = rightChannel->array2.first;
 					
 					for ( size_t iii = 0 ; iii < dim1 ; ++iii ) {
-						leftFilters[ii]->execFrame( firstValue_l + iii, &complexValue );
-						value = complexValue.real() * 2;
-						leftPMZ->appendFrameToChannel( ii, &value );
+						leftFilters[ii]->execFrame( firstValue_l + iii, &complexValue1 );
+						rightFilters[ii]->execFrame( firstValue_r + iii, &complexValue2 );
+
+						value1 = complexValue1.real() * 2;
+						value2 = complexValue2.real() * 2;
 						
-						rightFilters[ii]->execFrame( firstValue_r + iii, &complexValue );
-						value = complexValue.real() * 2;
-						rightPMZ->appendFrameToChannel( ii, &value );
+						leftPMZ->appendFrameToChannel( ii, &value1 );
+						rightPMZ->appendFrameToChannel( ii, &value2 );
 					}
 				}
 

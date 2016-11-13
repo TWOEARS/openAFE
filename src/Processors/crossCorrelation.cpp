@@ -23,16 +23,18 @@ using namespace std;
 
 			vector<double> CrossCorrelation::processChannel( double* firstValue_l, double* firstValue_r ) {
 
+				vector<double > tmpWindowLeft( this->wSize ), tmpWindowRight( this->wSize );
+				
 				// Extract frame for left and right input
-				multiplication( this->win.data(), firstValue_l, this->wSize, firstValue_l );
-				multiplication( this->win.data(), firstValue_r, this->wSize, firstValue_r );
+				multiplication( this->win.data(), firstValue_l, this->wSize, tmpWindowLeft.data() );
+				multiplication( this->win.data(), firstValue_r, this->wSize, tmpWindowRight.data() );
 							
 				// Compute the N-points for the Fourier domain
 				size_t N = pow (2,nextpow2(2 * this->wSize - 1));
 
 				// Compute the frames in the Fourier domain										
-				vector<complex<double> > leftFFT = fft( firstValue_l, this->wSize, N );
-				vector<complex<double> > rightFFT = fft( firstValue_r, this->wSize, N );
+				vector<complex<double> > leftFFT = fft( tmpWindowLeft.data(), this->wSize, N );
+				vector<complex<double> > rightFFT = fft( tmpWindowRight.data(), this->wSize, N );
 												
 				// Compute cross-power spectrum
 				_conj( rightFFT );
@@ -50,20 +52,20 @@ using namespace std;
 					// TODO :
 				} else {
 					// Else keep lags lower than requested max
-					std::size_t jj = 0;
-					for( std::size_t ii = N - this->maxLag ; ii < N ; ++ii, ++jj ) {
+					size_t jj = 0;
+					for( size_t ii = N - this->maxLag ; ii < N ; ++ii, ++jj ) {
 						cFinal[jj] = c[ii];
 					}
-					for( std::size_t ii = 0 ; ii <= this->maxLag   ; ++ii, ++jj ) {
+					for( size_t ii = 0 ; ii < this->maxLag ; ++ii, ++jj ) {
 						cFinal[jj] = c[ii];
 					}
 				}
 	
-				double powL = sumPow( firstValue_l, this->wSize, 2 );
-				double powR = sumPow( firstValue_r, this->wSize, 2 );
+				double powL = sumPow( tmpWindowLeft.data(), this->wSize, 2 );
+				double powR = sumPow( tmpWindowRight.data(), this->wSize, 2 );
 				
 				double div = sqrt( powL * powR + EPSILON );
-				for ( std::size_t ii = 0 ; ii < this->lags.size() ; ++ii )
+				for ( size_t ii = 0 ; ii < this->lags.size() ; ++ii )
 					cFinal[ii] /= div;
 							
 				return cFinal;
@@ -112,7 +114,7 @@ using namespace std;
 				leftPMZ->appendChunk( zerosAccecor );
 				vector<vector<shared_ptr<twoCTypeBlock<double> > > > lastChunkOfPMZ = leftPMZ->getLastChunkAccesor();
 
-				std::size_t ii;
+				size_t ii;
 				uint32_t n_start;
 				for ( ii = 0 ; ii < totalFrames ; ++ii ) {
 
