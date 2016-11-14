@@ -20,7 +20,7 @@ namespace openAFE {
 								  const std::shared_ptr<twoCTypeBlock<double> > rightChannel );
 								  
 			inline
-			double ild( double* frame_r, double* frame_l );
+			void ild( double* frame_r, double* frame_l, double* value );
 			
 		public:
 		

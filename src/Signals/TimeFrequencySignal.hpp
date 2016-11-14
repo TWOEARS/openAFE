@@ -80,7 +80,7 @@ namespace openAFE {
 				buffer[ii]->push_frame( inFrame );
 		}
 
-		void setLastChunkSize( const unsigned int ii, size_t lastChunkSize ) {
+		void setLastChunkSize( const size_t ii, size_t lastChunkSize ) {
 				buffer[ii]->setLastChunkSize( lastChunkSize );
 		}
 		

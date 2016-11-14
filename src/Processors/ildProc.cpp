@@ -3,8 +3,8 @@
 using namespace openAFE;
 using namespace std;
 
-			double ILDProc::ild( double* frame_r, double* frame_l ) {	
-				return 10 * log10 ( ( *frame_r + EPSILON ) / ( *frame_l + EPSILON ) );
+			void ILDProc::ild( double* frame_r, double* frame_l, double* value ) {	
+				*value = 10 * log10 ( ( *frame_r + EPSILON ) / ( *frame_l + EPSILON ) );
 			}
 
 			void ILDProc::processChannel ( const size_t ii, const size_t totalFrames,
@@ -27,7 +27,7 @@ using namespace std;
 					mSq_l = meanSquare( tmpWindowLeft.data(), this->wSize );
 					mSq_r = meanSquare( tmpWindowRight.data(), this->wSize );					
 
-					value = this->ild( &mSq_r, &mSq_l );	
+					this->ild( &mSq_r, &mSq_l, &value );	
 						
 					leftPMZ->appendFrameToChannel( ii, &value );	
 				}
