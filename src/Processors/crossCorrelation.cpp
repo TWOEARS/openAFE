@@ -60,12 +60,28 @@ using namespace std;
 				
 				double div = sqrt( powL * powR + EPSILON );
 				
+				std::size_t jjL = 0;
 				if ( this->maxLag > this->wSize ) {
 					// Then pad with zeros
-					// TODO :
+					// TODO : Check this case
+					for( std::size_t ii = 0 ; ii < this->maxLag - this->wSize ; ++ii, ++jjL ) {
+						this->leftPMZ->appendFrameToChannel(jj, jjL, 0 / div);
+						this->leftPMZ->setLastChunkSize( jj, jjL, totalFrames);	
+					}
+					for( std::size_t ii = this->maxLag - this->wSize + 2 ; ii < this->maxLag ; ++ii, ++jjL ) {
+						this->leftPMZ->appendFrameToChannel(jj, jjL, c[ii] / div);
+						this->leftPMZ->setLastChunkSize( jj, jjL, totalFrames);	
+					}
+					for( std::size_t ii = 0 ; ii < this->wSize ; ++ii, ++jjL ) {
+						this->leftPMZ->appendFrameToChannel(jj, jjL, c[ii] / div);
+						this->leftPMZ->setLastChunkSize( jj, jjL, totalFrames);	
+					}
+					for( std::size_t ii = 0 ; ii < this->maxLag - this->wSize ; ++ii, ++jjL ) {
+						this->leftPMZ->appendFrameToChannel(jj, jjL, 0 / div);
+						this->leftPMZ->setLastChunkSize( jj, jjL, totalFrames);	
+					}
 				} else {
 					// Else keep lags lower than requested max
-					std::size_t jjL = 0;
 					for( std::size_t ii = N - this->maxLag ; ii < N ; ++ii, ++jjL ) {
 						this->leftPMZ->appendFrameToChannel(jj, jjL, c[ii] / div);
 						this->leftPMZ->setLastChunkSize( jj, jjL, totalFrames);	
@@ -118,9 +134,8 @@ using namespace std;
 					
 				// Waiting to join the threads
 				for (auto& t : threads)
-					t.join();				
+					t.join();								
 */				
-				
 				this->buffer_l->pop_chunk( totalFrames * this->hSize );
 				this->buffer_r->pop_chunk( totalFrames * this->hSize );
 
