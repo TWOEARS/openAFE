@@ -141,7 +141,16 @@ namespace openAFE {
 		std::size_t getSize() {
 			return this->buffer[0][0]->getSize();
 		}
+
+		inline
+		void appendFrameToChannel( const std::size_t n_channel,  const std::size_t n_lag, const T inFrame ) {		
+				buffer[n_channel][n_lag]->push_frame( &inFrame );
+		}
 		
+		void setLastChunkSize( const std::size_t n_channel,  const std::size_t n_lag, const size_t lastChunkSize ) {
+				buffer[n_channel][n_lag]->setLastChunkSize( lastChunkSize );
+		}		
+				
 	}; /* class CorrelationSignal */
 };	/* namespace openAFE */
 

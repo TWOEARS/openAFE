@@ -26,7 +26,10 @@ namespace openAFE {
 
 			void prepareForProcessing();
 
-			std::vector<double> processChannel( double* firstValue_l, double* firstValue_r );
+			void processChannel( double* firstValue_l, double* firstValue_r, std::size_t jj, std::size_t totalFrames, double* tmpWindowLeft, double* tmpWindowRight );
+
+			inline
+			void process( std::size_t totalFrames, std::size_t jj, double* firstValue_l, double* firstValue_r );
 			
 		public:
 		

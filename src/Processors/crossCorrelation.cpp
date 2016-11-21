@@ -1,5 +1,8 @@
 #include "crossCorrelation.hpp"
 
+#include <iostream>
+
+
 using namespace openAFE;
 using namespace std;
 
@@ -21,55 +24,57 @@ using namespace std;
 
 			}
 
-			vector<double> CrossCorrelation::processChannel( double* firstValue_l, double* firstValue_r ) {
+			void CrossCorrelation::process( size_t totalFrames, size_t jj, double* firstValue_l, double* firstValue_r ) {
+					size_t n_start = 0;
+					vector<double > tmpWindowLeft( this->wSize ), tmpWindowRight( this->wSize );
+					for ( size_t ii = 0 ; ii < totalFrames ; ++ii ) {
 
-				vector<double > tmpWindowLeft( this->wSize ), tmpWindowRight( this->wSize );
-				
-				// Extract frame for left and right input
-				multiplication( this->win.data(), firstValue_l, this->wSize, tmpWindowLeft.data() );
-				multiplication( this->win.data(), firstValue_r, this->wSize, tmpWindowRight.data() );
+						n_start = ii * this->hSize;
 							
+						this->processChannel( firstValue_l + n_start, firstValue_r + n_start, jj, totalFrames, tmpWindowLeft.data(), tmpWindowRight.data()  );
+					}				
+			}
+
+			void CrossCorrelation::processChannel( double* firstValue_l, double* firstValue_r, size_t jj, size_t totalFrames,  double* tmpWindowLeft, double* tmpWindowRight ) {
+
+				// Extract frame for left and right input		
+				multiplication( this->win.data(), firstValue_l, this->wSize, tmpWindowLeft );
+				multiplication( this->win.data(), firstValue_r, this->wSize, tmpWindowRight );						
+
 				// Compute the N-points for the Fourier domain
 				size_t N = pow (2,nextpow2(2 * this->wSize - 1));
 
 				// Compute the frames in the Fourier domain										
-				vector<complex<double> > leftFFT = fft( tmpWindowLeft.data(), this->wSize, N );
-				vector<complex<double> > rightFFT = fft( tmpWindowRight.data(), this->wSize, N );
-												
+				vector<complex<double> > leftFFT = fft( tmpWindowLeft, this->wSize, N );
+				vector<complex<double> > rightFFT = fft( tmpWindowRight, this->wSize, N );
+																
 				// Compute cross-power spectrum
 				_conj( rightFFT );
 				multiplication( leftFFT.data(), rightFFT.data(), leftFFT.size(), leftFFT.data() );
-
+				
 				// Back to time domain
 				vector<double> c = ifft( leftFFT.data(), this->wSize, N );
-								
-                // Adjust to requested maximum lag and move negative
-                // lags upfront
-				vector<double> cFinal( this->lags.size() );
-
+				
+				double powL = sumPow( tmpWindowLeft, this->wSize, 2 );
+				double powR = sumPow( tmpWindowRight, this->wSize, 2 );
+				
+				double div = sqrt( powL * powR + EPSILON );
+				
 				if ( this->maxLag > this->wSize ) {
 					// Then pad with zeros
 					// TODO :
 				} else {
 					// Else keep lags lower than requested max
-					size_t jj = 0;
-					for( size_t ii = N - this->maxLag ; ii < N ; ++ii, ++jj ) {
-						cFinal[jj] = c[ii];
+					std::size_t jjL = 0;
+					for( std::size_t ii = N - this->maxLag ; ii < N ; ++ii, ++jjL ) {
+						this->leftPMZ->appendFrameToChannel(jj, jjL, c[ii] / div);
+						this->leftPMZ->setLastChunkSize( jj, jjL, totalFrames);	
 					}
-					for( size_t ii = 0 ; ii < this->maxLag ; ++ii, ++jj ) {
-						cFinal[jj] = c[ii];
+					for( std::size_t ii = 0 ; ii < this->maxLag + 1 ; ++ii, ++jjL ) {
+						this->leftPMZ->appendFrameToChannel(jj, jjL, c[ii] / div);
+						this->leftPMZ->setLastChunkSize( jj, jjL, totalFrames);	
 					}
-				}
-	
-				double powL = sumPow( tmpWindowLeft.data(), this->wSize, 2 );
-				double powR = sumPow( tmpWindowRight.data(), this->wSize, 2 );
-				
-				double div = sqrt( powL * powR + EPSILON );
-				for ( size_t ii = 0 ; ii < this->lags.size() ; ++ii )
-					cFinal[ii] /= div;
-							
-				return cFinal;
-				
+				}		
 			}
 			
 			CrossCorrelation::CrossCorrelation (const string nameArg, shared_ptr<IHCProc > upperProcPtr, double wSizeSec, double hSizeSec, double maxDelaySec, windowType wname )
@@ -103,34 +108,21 @@ using namespace std;
 
 				size_t totalFrames = floor( ( this->buffer_l->getSize() - ( this->wSize - this->hSize ) ) / this->hSize );
 
-				// Creating a chunk of zeros.
-				this->zerosVector.resize( totalFrames, 0 );
-
-				// Creating a accesor to it (The data on zerosVector is continious)
-				this->zerosAccecor->array1.first = zerosVector.data(); this->zerosAccecor->array2.first = nullptr;
-				this->zerosAccecor->array1.second = zerosVector.size(); this->zerosAccecor->array2.second = 0;
-
-				// Appending this chunk to all channels of the PMZ.
-				leftPMZ->appendChunk( zerosAccecor );
-				vector<vector<shared_ptr<twoCTypeBlock<double> > > > lastChunkOfPMZ = leftPMZ->getLastChunkAccesor();
-
-				size_t ii;
-				uint32_t n_start;
-				for ( ii = 0 ; ii < totalFrames ; ++ii ) {
-
-					n_start = ii * this->hSize;
-					
-					 for ( std::size_t jj = 0 ; jj < this->get_nChannel() ; ++jj ) {
-							
-						vector<double> chunk = this->processChannel( l_innerBuffer[jj]->array1.first + n_start, r_innerBuffer[jj]->array1.first + n_start );
-						
-						for ( std::size_t jjL = 0 ; jjL < this->lags.size() ; ++jjL )
-							*( lastChunkOfPMZ[jj][jjL]->getPtr(ii) ) = chunk[jjL];
-					}
+				for ( std::size_t jj = 0 ; jj < this->get_nChannel() ; ++jj ) {
+					this->process( totalFrames, jj, l_innerBuffer[jj]->array1.first, r_innerBuffer[jj]->array1.first );
 				}
 				
-				this->buffer_l->pop_chunk( ii * this->hSize );
-				this->buffer_r->pop_chunk( ii * this->hSize );
+/*				vector<thread> threads;
+				for ( size_t jj = 0 ; jj < this->get_nChannel() ; ++jj )
+					threads.push_back(thread( &CrossCorrelation::process, this, totalFrames, jj, l_innerBuffer[jj]->array1.first, r_innerBuffer[jj]->array1.first ));
+					
+				// Waiting to join the threads
+				for (auto& t : threads)
+					t.join();				
+*/				
+				
+				this->buffer_l->pop_chunk( totalFrames * this->hSize );
+				this->buffer_r->pop_chunk( totalFrames * this->hSize );
 
 			}
 			
